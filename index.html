@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이헌타 정밀 계산기 v5.2</title>
+    <title>이헌타 정밀 계산기 v5.5</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -44,12 +44,9 @@
     <button class="btn" onclick="toggleElement('help-box')" style="background: #222; border: 1px solid #444; margin-bottom: 5px;">📖 사용 설명서 (클릭하여 열기/닫기)</button>
     <div id="help-box" class="help-box">
         <div id="help-content">
-            1. <b>종족</b>: 본인이 목표하는 종족에 대한 값을 본인이 생각해서 작성해야합니다.<br>
-            2. <b>능력치 작성</b>: 모든 칸에 대하여 헌터 및 각종 능력치에 관한 상세 정보를 작성합니다.<br>
-            3. <b>건물+펫</b>: 건물 능력치 + 마을 펫의 합산입니다. 콜로 마을 펫 미구매시 변경 필요합니다.<br>
-            4. <b>현재 장비</b>: 증폭은 질풍신, 용목, 탈것 장비 등 증폭효과에 대한 합산을 작성.<br>
-            5. <b>시뮬레이션</b>: 추가할 옵션은 숫자로 기입, 빠질 옵션은 -숫자로 기입하세요.<br>
-            6. <b>이외</b>: "이외"라는 칸은 새로운 해당 스텟 증가 요소가 있을시 작성용입니다.<br>
+            1. <b>종족</b>: 목표 종족에 대한 수치를 직접 입력하세요.<br>
+            2. <b>공격력/치피</b>: 각 항목에 맞는 수치를 입력하면 배율로 환산됩니다.<br>
+            3. <b>로직</b>: 종족 피해량은 (기본 100) × (장비룬 배율) × (탈것도감 배율)로 계산됩니다.
         </div>
     </div>
 
@@ -64,7 +61,7 @@
         </div>
     </div>
 
-    <div class="section-title">공격력 증가 항목 </div>
+    <div class="section-title">공격력 증가 항목</div>
     <div class="card">
         <div class="row">
             <div><label>성격</label><select id="b_per" onchange="calc()"><option value="0">없음</option><option value="7">영웅심리(+7%)</option><option value="10">힘쌘(+10%)</option></select></div>
@@ -108,7 +105,7 @@
     <div class="section-title">치명타 피해량 (기본 175)</div>
     <div class="card">
         <div class="row">
-            <div><label>건물+펫(기본81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()"></div>
+            <div><label>C: 건물+펫(기본81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()"></div>
             <div><label>이외(합연산)</label><input type="number" id="cp_etc" placeholder="0" oninput="calc()"></div>
         </div>
         <hr><label style="text-align:center; margin-bottom:5px;">[치피 탈것 및 도감]</label>
@@ -124,7 +121,7 @@
             <div><label>A: 승전 버프(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()"></div>
             <div><label>D: 이외(곱연산 %)</label><input type="number" id="sp_d" placeholder="0" oninput="calc()"></div>
         </div>
-        <hr><label style="text-align:center; margin-bottom:5px;">[종족 탈것 및 도감]</label>
+        <hr><label style="text-align:center; margin-bottom:5px;">[종족 탈것 및 도감 - 곱연산 계열]</label>
         <div class="row">
             <div><label>탈것+탈것장비(%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()"></div>
             <div><label>도감(%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()"></div>
@@ -150,7 +147,7 @@
         </div>
     </div>
 
-    <div class="section-title">✨ 시뮬레이션 </div>
+    <div class="section-title">✨ 시뮬레이션</div>
     <div class="card" style="border: 1px solid var(--accent);">
         <div class="row">
             <div><label>추가 전공</label><input type="number" id="n_atk" placeholder="0" oninput="calc()"></div>
@@ -177,13 +174,14 @@
     function calc() {
         const g = (id) => {
             const val = document.getElementById(id).value;
-            return val === "" ? 0 : parseFloat(val);
+            const placeholder = document.getElementById(id).placeholder;
+            return val === "" ? (placeholder === "" ? 0 : parseFloat(placeholder)) : parseFloat(val);
         };
         const mode = document.getElementById('calc_mode').value;
         const carve = document.getElementById('a_carve').checked ? 107 : 100;
 
         const getStats = (addAtk=0, addCp=0, addAmp=0, addSp=0) => {
-            // 1. 공격력
+            // 1. 공격력 배율
             const multA = (100 + g('a_win') + g('a_dungeon')) / 100;
             const b_sum = g('b_per') + g('b_uni') + g('b_stat_grade') + g('b_grade_val') + g('b_etc');
             const cur_atk_sum = g('cur_atk_eq') + g('cur_atk_rune');
@@ -191,27 +189,26 @@
             const d_total = g('d_mu') + g('d_dogam') + g('d_in') + g('d_ride');
             const multD = (100 + d_total) / 100;
             const multE = (100 + g('e_fairy')) / 100;
-            
             const totalAtk = (mode === 'village') ? carve * multA * multBC * multD * multE : carve * multBC * multD * multE;
 
-            // 2. 치피
+            // 2. 치피 배율 (기본 + 합연산 항목들) * (곱연산 배율)
             const cpCurSum = g('cur_cp_eq') + g('cur_cp_rune');
-            const cpSum = 175 + g('cp_base') + g('cp_etc') + cpCurSum + addCp;
+            const cpBaseSum = 175 + g('cp_base') + g('cp_etc') + cpCurSum + addCp;
             const cpMult = (100 + g('cp_mult_dogam') + g('cp_mult_ride')) / 100;
-            const totalCp = (cpSum * cpMult) / 100;
+            const totalCp = (cpBaseSum * cpMult) / 100;
 
-            // 3. 종족
-            const spMultA = (100 + g('sp_win')) / 100;
-            const spCurSum = g('cur_sp_eq') + g('cur_sp_rune');
-            const spMultBC = (100 + g('sp_ride') + g('sp_dogam') + spCurSum + addSp) / 100;
-            const spMultD = (100 + g('sp_d')) / 100;
-            const totalSp = (100 * spMultA * spMultBC * spMultD) / 100;
+            // 3. 종족 피해량 (요청하신 로직: 100 * 1.n * 1.n 구조)
+            const spMultWin = (100 + g('sp_win')) / 100; // 승전
+            const spEqRuneMult = (100 + g('cur_sp_eq') + g('cur_sp_rune') + addSp) / 100; // 장비+룬 배율 (1.n)
+            const spRideDogamMult = (100 + g('sp_ride') + g('sp_dogam')) / 100; // 탈것+도감 배율 (1.n)
+            const spEtcMult = (100 + g('sp_d')) / 100; // 기타 곱연산
+            const totalSp = (100 * spEqRuneMult * spRideDogamMult * spMultWin * spEtcMult) / 100;
 
             // 4. 증폭
             const totalAmp = (100 + g('cur_amp') + addAmp) / 100;
 
             const final = totalAtk * totalCp * totalSp * totalAmp;
-            return { multA, multBC, multD, multE, totalAtk, cpSum, cpMult, totalCp, spMultA, spMultBC, spMultD, totalSp, totalAmp, final };
+            return { multA, multBC, multD, multE, totalAtk, cpBaseSum, cpMult, totalCp, spEqRuneMult, spRideDogamMult, spMultWin, spEtcMult, totalSp, totalAmp, final };
         };
 
         const cur = getStats();
@@ -227,9 +224,9 @@
 
         const generateLog = (title, data, color) => {
             let log = `<div style='color:${color}; font-weight:bold; border-bottom:1px solid #444;'>[${title}]</div>`;
-            log += `공격력: ${carve}${mode==='village'?'×A':''}×BC×D×E = ${data.totalAtk.toFixed(1)}<br>`;
-            log += `치피배율: (${data.cpSum}×${data.cpMult.toFixed(2)})/100 = ${data.totalCp.toFixed(2)}배<br>`;
-            log += `종족배율: (100×${data.spMultA.toFixed(2)}×${data.spMultBC.toFixed(2)}×${data.spMultD.toFixed(2)})/100 = ${data.totalSp.toFixed(2)}배<br>`;
+            log += `공격력: ${carve}${mode==='village'?' × '+data.multA.toFixed(3):''} × ${data.multBC.toFixed(3)} × ${data.multD.toFixed(3)} × ${data.multE.toFixed(3)} = ${data.totalAtk.toFixed(1)}<br>`;
+            log += `치피배율: (${data.cpBaseSum} × ${data.cpMult.toFixed(3)}) / 100 = ${data.totalCp.toFixed(2)}배<br>`;
+            log += `종족배율: (100 × ${data.spEqRuneMult.toFixed(3)} × ${data.spRideDogamMult.toFixed(3)} × ${data.spMultWin.toFixed(2)} × ${data.spEtcMult.toFixed(2)}) / 100 = ${data.totalSp.toFixed(2)}배<br>`;
             log += `최종수식: ${data.totalAtk.toFixed(1)} (공) × ${data.totalCp.toFixed(2)} (치) × ${data.totalSp.toFixed(2)} (종) × ${data.totalAmp.toFixed(2)} (증)<br>`;
             log += `최종결과: <b>${Math.floor(data.final).toLocaleString()}</b><br><br>`;
             return log;
