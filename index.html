@@ -44,10 +44,12 @@
     <button class="btn" onclick="toggleElement('help-box')" style="background: #222; border: 1px solid #444; margin-bottom: 5px;">📖 사용 설명서 (클릭하여 열기/닫기)</button>
     <div id="help-box" class="help-box">
         <div id="help-content">
-            1. <b>공격력 기초</b>: 무기 각인 여부와 승전/지던 버프를 입력합니다.<br>
-            2. <b>세부 항목</b>: 도감, 탈것, 장비 수치를 각각의 칸에 정확히 입력해주세요.<br>
-            3. <b>시뮬레이션</b>: 아이템 교체 시 변화하는 수치만 '추가분' 칸에 적으면 효율이 계산됩니다.<br>
-            4. <b>로그 확인</b>: 하단 버튼을 눌러 상세 수식이 맞는지 검토하세요.
+            1. <b>종족</b>: 본인이 목표하는 종족에 대한 값을 본인이 생각해서 작성해야합니다.<br>
+            2. <b>능력치 작성</b>: 모든 칸에 대하여 헌터 및 각종 능력치에 관한 상세 정보를 작성합니다.<br>
+            3. <b>건물+펫</b>: 건물 능력치 + 마을 펫의 합산입니다. 콜로 마을 펫 미구매시 변경 필요합니다.<br>
+            4. <b>현재 장비</b>: 증폭은 질풍신, 용목 등 증폭효과에 대한 합산을 작성.<br>
+            5. <b>시뮬레이션</b>: 추가할 옵션은 숫자로 기입, 빠질 옵션은 -숫자로 기입하세요.<br>
+            6. <b>이외</b>: "이외"라는 칸은 새로운 해당 스텟 증가 요소가 있을시 작성용입니다.<br>
         </div>
     </div>
 
@@ -62,14 +64,14 @@
         </div>
     </div>
 
-    <div class="section-title">공격력 증가 항목 (B, C, D, E)</div>
+    <div class="section-title">공격력 증가 항목 </div>
     <div class="card">
         <div class="row">
-            <div><label>성격</label><select id="b_per" onchange="calc()"><option value="0">없음</option><option value="7">영웅심리(+7)</option><option value="10">힘쌘(+10)</option></select></div>
+            <div><label>성격</label><select id="b_per" onchange="calc()"><option value="0">없음</option><option value="7">영웅심리(+7%)</option><option value="10">힘쌘(+10%)</option></select></div>
             <div><label>연합 버프</label><input type="number" id="b_uni" placeholder="15" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>스텟 등급</label>
+            <div><label>공격력 스텟 등급</label>
                 <select id="b_stat_grade" onchange="calc()">
                     <option value="0">회색 (+0%)</option>
                     <option value="10">파랑 (+10%)</option>
@@ -77,7 +79,7 @@
                     <option value="30" selected>보라 (+30%)</option>
                 </select>
             </div>
-            <div><label>장비 등급</label>
+            <div><label>헌터 등급</label>
                 <select id="b_grade_val" onchange="calc()">
                     <option value="4">H+ (+4%)</option>
                     <option value="5">L (+5%)</option>
@@ -93,12 +95,12 @@
         </div>
         <hr><label style="text-align:center; margin-bottom:5px;">[D: 공격력 % 세분화]</label>
         <div class="row-3">
-            <div><label>무코(%)</label><input type="number" id="d_mu" placeholder="0" oninput="calc()"></div>
+            <div><label>무기 코스튬(%)</label><input type="number" id="d_mu" placeholder="0" oninput="calc()"></div>
             <div><label>도감(%)</label><input type="number" id="d_dogam" placeholder="0" oninput="calc()"></div>
             <div><label>인장(%)</label><input type="number" id="d_in" placeholder="0" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>D: 탈것(공 %)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>D: 탈것+탈것장비(공 %)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
             <div><label>E: 요정(공 %)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
@@ -112,7 +114,7 @@
         <hr><label style="text-align:center; margin-bottom:5px;">[치피 곱연산 % 세분화]</label>
         <div class="row">
             <div><label>도감(곱 %)</label><input type="number" id="cp_mult_dogam" placeholder="0" oninput="calc()"></div>
-            <div><label>탈것(곱 %)</label><input type="number" id="cp_mult_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>탈것+탈것장비(곱 %)</label><input type="number" id="cp_mult_ride" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
@@ -124,7 +126,7 @@
         </div>
         <hr><label style="text-align:center; margin-bottom:5px;">[종족 B+C 합연산 세분화]</label>
         <div class="row">
-            <div><label>탈것(%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>탈것+탈것장비(%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()"></div>
             <div><label>도감(%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
@@ -148,7 +150,7 @@
         </div>
     </div>
 
-    <div class="section-title">✨ 시뮬레이션 (추가분)</div>
+    <div class="section-title">✨ 시뮬레이션 </div>
     <div class="card" style="border: 1px solid var(--accent);">
         <div class="row">
             <div><label>추가 전공</label><input type="number" id="n_atk" placeholder="0" oninput="calc()"></div>
@@ -163,7 +165,7 @@
     <button class="btn" onclick="toggleElement('log-box')">📊 상세 계산 로그 비교 보기</button>
     <div id="log-box" class="log-container"></div>
 
-    <div class="footer">made by 과자꽃</div>
+    <div class="footer">Made by 과자꽃 to Flower연합</div>
 </div>
 
 <script>
