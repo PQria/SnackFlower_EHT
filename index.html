@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EHT 정밀 계산기 v5.1</title>
+    <title>이헌타 정밀 계산기 v5.2</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -12,12 +12,14 @@
         .section-title { font-weight: bold; color: var(--accent); margin: 15px 0 5px; font-size: 0.9rem; }
         .card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         label { font-size: 0.7rem; color: #aaa; display: block; margin-bottom: 2px; }
-        input, select { width: 100%; background: #333; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; box-sizing: border-box; }
+        input, select { width: 100%; background: #333; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
         input[type="checkbox"] { width: auto; transform: scale(1.2); margin-right: 8px; }
         .eff { font-size: 1.4rem; color: var(--accent); font-weight: bold; margin-top: 5px; }
-        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.85rem; border: 1px solid #444; color: #00ff41; overflow-x: auto; line-height: 1.5; }
-        .log-btn { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; border: 1px solid #444; color: #00ff41; overflow-x: auto; line-height: 1.6; }
+        .btn { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
+        .help-box { background: #333; border: 1px dashed var(--accent); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; color: #ccc; display: none; }
         .footer { text-align: center; margin-top: 30px; font-size: 0.8rem; color: #666; }
         hr { border: 0; border-top: 1px solid #444; margin: 10px 0; }
     </style>
@@ -39,96 +41,134 @@
 </div>
 
 <div class="container">
+    <button class="btn" onclick="toggleElement('help-box')" style="background: #222; border: 1px solid #444; margin-bottom: 5px;">📖 사용 설명서 (클릭하여 열기/닫기)</button>
+    <div id="help-box" class="help-box">
+        <div id="help-content">
+            1. <b>공격력 기초</b>: 무기 각인 여부와 승전/지던 버프를 입력합니다.<br>
+            2. <b>세부 항목</b>: 도감, 탈것, 장비 수치를 각각의 칸에 정확히 입력해주세요.<br>
+            3. <b>시뮬레이션</b>: 아이템 교체 시 변화하는 수치만 '추가분' 칸에 적으면 효율이 계산됩니다.<br>
+            4. <b>로그 확인</b>: 하단 버튼을 눌러 상세 수식이 맞는지 검토하세요.
+        </div>
+    </div>
+
     <div class="section-title">공격력 기초 (A)</div>
     <div class="card">
         <div style="margin-bottom:10px;">
             <label><input type="checkbox" id="a_carve" onchange="calc()"> 무기 각인 활성화 (기본공 100→107)</label>
         </div>
         <div class="row">
-            <div><label>승전 버프(%)</label><input type="number" id="a_win" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>지던 버프(%)</label><input type="number" id="a_dungeon" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>승전 버프(%)</label><input type="number" id="a_win" placeholder="0" oninput="calc()"></div>
+            <div><label>지던 버프(%)</label><input type="number" id="a_dungeon" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
     <div class="section-title">공격력 증가 항목 (B, C, D, E)</div>
     <div class="card">
         <div class="row">
-            <div><label>성격</label><select id="b_per" onchange="calc()"><option value="0">없음 (+0)</option><option value="7">영웅심리 (+7)</option><option value="10">힘쌘 (+10)</option></select></div>
-            <div><label>연합(마을15/콜로5)</label><input type="number" id="b_uni" placeholder="15" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>성격</label><select id="b_per" onchange="calc()"><option value="0">없음</option><option value="7">영웅심리(+7)</option><option value="10">힘쌘(+10)</option></select></div>
+            <div><label>연합 버프</label><input type="number" id="b_uni" placeholder="15" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>스텟(보라30)</label><input type="number" id="b_stat" placeholder="30" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>등급(U+8)</label><input type="number" id="b_grade" placeholder="8" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>스텟 등급</label>
+                <select id="b_stat_grade" onchange="calc()">
+                    <option value="0">회색 (+0%)</option>
+                    <option value="10">파랑 (+10%)</option>
+                    <option value="20">주황 (+20%)</option>
+                    <option value="30" selected>보라 (+30%)</option>
+                </select>
+            </div>
+            <div><label>장비 등급</label>
+                <select id="b_grade_val" onchange="calc()">
+                    <option value="4">H+ (+4%)</option>
+                    <option value="5">L (+5%)</option>
+                    <option value="6">L+ (+6%)</option>
+                    <option value="7">U (+7%)</option>
+                    <option value="8" selected>U+ (+8%)</option>
+                </select>
+            </div>
         </div>
         <div class="row">
-            <div><label>비법+이외</label><input type="number" id="b_etc" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>C: 건물+펫(85)</label><input type="number" id="c_val" placeholder="85" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>비법+이외</label><input type="number" id="b_etc" placeholder="0" oninput="calc()"></div>
+            <div><label>C: 건물+펫</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
         </div>
-        <hr>
-        <div class="row">
-            <div><label>D: 무코+도감+인장(%)</label><input type="number" id="d_sum" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>D: 탈것(공 %)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+        <hr><label style="text-align:center; margin-bottom:5px;">[D: 공격력 % 세분화]</label>
+        <div class="row-3">
+            <div><label>무코(%)</label><input type="number" id="d_mu" placeholder="0" oninput="calc()"></div>
+            <div><label>도감(%)</label><input type="number" id="d_dogam" placeholder="0" oninput="calc()"></div>
+            <div><label>인장(%)</label><input type="number" id="d_in" placeholder="0" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>E: 요정(%)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>D: 탈것(공 %)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>E: 요정(공 %)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
     <div class="section-title">치명타 피해량 (기본 175)</div>
     <div class="card">
         <div class="row">
-            <div><label>건물+펫(기본81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>이외(합연산)</label><input type="number" id="cp_etc" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>건물+펫(기본81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()"></div>
+            <div><label>이외(합연산)</label><input type="number" id="cp_etc" placeholder="0" oninput="calc()"></div>
         </div>
+        <hr><label style="text-align:center; margin-bottom:5px;">[치피 곱연산 % 세분화]</label>
         <div class="row">
-            <div><label>도감+탈것(곱연산 %)</label><input type="number" id="cp_mult_val" placeholder="100" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>도감(곱 %)</label><input type="number" id="cp_mult_dogam" placeholder="0" oninput="calc()"></div>
+            <div><label>탈것(곱 %)</label><input type="number" id="cp_mult_ride" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
     <div class="section-title">종족 피해량 (기본 100)</div>
     <div class="card">
         <div class="row">
-            <div><label>A: 승전 버프(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>B+C: 탈것+도감(%)</label><input type="number" id="sp_bc" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>A: 승전 버프(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()"></div>
+            <div><label>D: 이외(곱연산 %)</label><input type="number" id="sp_d" placeholder="0" oninput="calc()"></div>
         </div>
+        <hr><label style="text-align:center; margin-bottom:5px;">[종족 B+C 합연산 세분화]</label>
         <div class="row">
-            <div><label>D: 이외(곱연산 %)</label><input type="number" id="sp_d" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>탈것(%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>도감(%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
-    <div class="section-title">📦 현재 장비 + 룬</div>
+    <div class="section-title">📦 현재 장비 + 룬 상세</div>
     <div class="card" style="border: 1px solid #555;">
         <div class="row">
-            <div><label>전공(공%)</label><input type="number" id="cur_atk" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>치피(합연산 %)</label><input type="number" id="cur_cp" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>전공 장비(%)</label><input type="number" id="cur_atk_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>전공 룬(%)</label><input type="number" id="cur_atk_rune" placeholder="0" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>증폭(%)</label><input type="number" id="cur_amp" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>종족(합연산 %)</label><input type="number" id="cur_sp" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>치피 장비(%)</label><input type="number" id="cur_cp_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>치피 룬(%)</label><input type="number" id="cur_cp_rune" placeholder="0" oninput="calc()"></div>
+        </div>
+        <div class="row">
+            <div><label>종족 장비(%)</label><input type="number" id="cur_sp_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>종족 룬(%)</label><input type="number" id="cur_sp_rune" placeholder="0" oninput="calc()"></div>
+        </div>
+        <div class="row">
+            <div style="grid-column: span 2;"><label>증폭(%)</label><input type="number" id="cur_amp" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
     <div class="section-title">✨ 시뮬레이션 (추가분)</div>
     <div class="card" style="border: 1px solid var(--accent);">
         <div class="row">
-            <div><label>추가 전공</label><input type="number" id="n_atk" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>추가 치피</label><input type="number" id="n_cp" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>추가 전공</label><input type="number" id="n_atk" placeholder="0" oninput="calc()"></div>
+            <div><label>추가 치피</label><input type="number" id="n_cp" placeholder="0" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>추가 증폭</label><input type="number" id="n_amp" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
-            <div><label>추가 종족</label><input type="number" id="n_sp" placeholder="0" oninput="calc()" onfocus="this.value=''"></div>
+            <div><label>추가 증폭</label><input type="number" id="n_amp" placeholder="0" oninput="calc()"></div>
+            <div><label>추가 종족</label><input type="number" id="n_sp" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
-    <button class="log-btn" onclick="toggleLog()">📊 상세 계산 로그 비교 보기</button>
+    <button class="btn" onclick="toggleElement('log-box')">📊 상세 계산 로그 비교 보기</button>
     <div id="log-box" class="log-container"></div>
 
     <div class="footer">made by 과자꽃</div>
 </div>
 
 <script>
-    function toggleLog() {
-        const box = document.getElementById('log-box');
+    function toggleElement(id) {
+        const box = document.getElementById(id);
         box.style.display = (box.style.display === 'block') ? 'none' : 'block';
     }
 
@@ -141,22 +181,27 @@
         const carve = document.getElementById('a_carve').checked ? 107 : 100;
 
         const getStats = (addAtk=0, addCp=0, addAmp=0, addSp=0) => {
-            // 1. 공격력 (A * (B+C) * D * E)
+            // 1. 공격력
             const multA = (100 + g('a_win') + g('a_dungeon')) / 100;
-            const multBC = (100 + g('b_per') + g('b_uni') + g('b_stat') + g('b_grade') + g('b_etc') + g('c_val') + g('cur_atk') + addAtk) / 100;
-            const multD = (100 + g('d_sum') + g('d_ride')) / 100;
+            const b_sum = g('b_per') + g('b_uni') + g('b_stat_grade') + g('b_grade_val') + g('b_etc');
+            const cur_atk_sum = g('cur_atk_eq') + g('cur_atk_rune');
+            const multBC = (100 + b_sum + g('c_val') + cur_atk_sum + addAtk) / 100;
+            const d_total = g('d_mu') + g('d_dogam') + g('d_in') + g('d_ride');
+            const multD = (100 + d_total) / 100;
             const multE = (100 + g('e_fairy')) / 100;
             
             const totalAtk = (mode === 'village') ? carve * multA * multBC * multD * multE : carve * multBC * multD * multE;
 
-            // 2. 치피 ((175 + 합산) * 곱연산배수)
-            const cpSum = 175 + g('cp_base') + g('cp_etc') + g('cur_cp') + addCp;
-            const cpMult = (100 + g('cp_mult_val')) / 100;
+            // 2. 치피
+            const cpCurSum = g('cur_cp_eq') + g('cur_cp_rune');
+            const cpSum = 175 + g('cp_base') + g('cp_etc') + cpCurSum + addCp;
+            const cpMult = (100 + g('cp_mult_dogam') + g('cp_mult_ride')) / 100;
             const totalCp = (cpSum * cpMult) / 100;
 
-            // 3. 종족 (100 * A * (B+C) * D)
+            // 3. 종족
             const spMultA = (100 + g('sp_win')) / 100;
-            const spMultBC = (100 + g('sp_bc') + g('cur_sp') + addSp) / 100;
+            const spCurSum = g('cur_sp_eq') + g('cur_sp_rune');
+            const spMultBC = (100 + g('sp_ride') + g('sp_dogam') + spCurSum + addSp) / 100;
             const spMultD = (100 + g('sp_d')) / 100;
             const totalSp = (100 * spMultA * spMultBC * spMultD) / 100;
 
@@ -178,20 +223,17 @@
         out.innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
         out.style.color = diff >= 0 ? '#00e676' : '#ff5252';
 
-        // 로그 비교 출력
-        let logHtml = `<div style='color:#f39c12; font-weight:bold; border-bottom:1px solid #444;'>[현재 세팅]</div>`;
-        logHtml += `공격력: ${carve}×A(${cur.multA.toFixed(2)})×BC(${cur.multBC.toFixed(2)})×D(${cur.multD.toFixed(2)})×E(${cur.multE.toFixed(2)}) = ${cur.totalAtk.toFixed(1)}<br>`;
-        logHtml += `치피배율: (${cur.cpSum}×${cur.cpMult.toFixed(2)})/100 = ${cur.totalCp.toFixed(2)}배<br>`;
-        logHtml += `종족배율: (100×${cur.spMultA.toFixed(2)}×${cur.spMultBC.toFixed(2)}×${cur.spMultD.toFixed(2)})/100 = ${cur.totalSp.toFixed(2)}배<br>`;
-        logHtml += `최종: <b>${Math.floor(cur.final).toLocaleString()}</b><br><br>`;
+        const generateLog = (title, data, color) => {
+            let log = `<div style='color:${color}; font-weight:bold; border-bottom:1px solid #444;'>[${title}]</div>`;
+            log += `공격력: ${carve}${mode==='village'?'×A':''}×BC×D×E = ${data.totalAtk.toFixed(1)}<br>`;
+            log += `치피배율: (${data.cpSum}×${data.cpMult.toFixed(2)})/100 = ${data.totalCp.toFixed(2)}배<br>`;
+            log += `종족배율: (100×${data.spMultA.toFixed(2)}×${data.spMultBC.toFixed(2)}×${data.spMultD.toFixed(2)})/100 = ${data.totalSp.toFixed(2)}배<br>`;
+            log += `최종수식: ${data.totalAtk.toFixed(1)} (공) × ${data.totalCp.toFixed(2)} (치) × ${data.totalSp.toFixed(2)} (종) × ${data.totalAmp.toFixed(2)} (증)<br>`;
+            log += `최종결과: <b>${Math.floor(data.final).toLocaleString()}</b><br><br>`;
+            return log;
+        };
 
-        logHtml += `<div style='color:#00e676; font-weight:bold; border-bottom:1px solid #444;'>[비교 세팅]</div>`;
-        logHtml += `공격력: ${carve}×A(${next.multA.toFixed(2)})×BC(${next.multBC.toFixed(2)})×D(${next.multD.toFixed(2)})×E(${next.multE.toFixed(2)}) = ${next.totalAtk.toFixed(1)}<br>`;
-        logHtml += `치피배율: (${next.cpSum}×${next.cpMult.toFixed(2)})/100 = ${next.totalCp.toFixed(2)}배<br>`;
-        logHtml += `종족배율: (100×${next.spMultA.toFixed(2)}×${next.spMultBC.toFixed(2)}×${next.spMultD.toFixed(2)})/100 = ${next.totalSp.toFixed(2)}배<br>`;
-        logHtml += `최종: <b>${Math.floor(next.final).toLocaleString()}</b>`;
-
-        document.getElementById('log-box').innerHTML = logHtml;
+        document.getElementById('log-box').innerHTML = generateLog("현재 세팅", cur, "#f39c12") + generateLog("비교 세팅", next, "#00e676");
     }
     window.onload = calc;
 </script>
