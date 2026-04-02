@@ -47,7 +47,7 @@
             1. <b>종족</b>: 본인이 목표하는 종족에 대한 값을 본인이 생각해서 작성해야합니다.<br>
             2. <b>능력치 작성</b>: 모든 칸에 대하여 헌터 및 각종 능력치에 관한 상세 정보를 작성합니다.<br>
             3. <b>건물+펫</b>: 건물 능력치 + 마을 펫의 합산입니다. 콜로 마을 펫 미구매시 변경 필요합니다.<br>
-            4. <b>현재 장비</b>: 증폭은 질풍신, 용목 등 증폭효과에 대한 합산을 작성.<br>
+            4. <b>현재 장비</b>: 증폭은 질풍신, 용목, 탈것 장비 등 증폭효과에 대한 합산을 작성.<br>
             5. <b>시뮬레이션</b>: 추가할 옵션은 숫자로 기입, 빠질 옵션은 -숫자로 기입하세요.<br>
             6. <b>이외</b>: "이외"라는 칸은 새로운 해당 스텟 증가 요소가 있을시 작성용입니다.<br>
         </div>
@@ -93,7 +93,7 @@
             <div><label>비법+이외</label><input type="number" id="b_etc" placeholder="15" oninput="calc()"></div>
             <div><label>C: 건물+펫</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
         </div>
-        <hr><label style="text-align:center; margin-bottom:5px;">[D: 공격력 % 세분화]</label>
+        <hr><label style="text-align:center; margin-bottom:5px;">[전공 세부 능력치]</label>
         <div class="row-3">
             <div><label>무기 코스튬(%)</label><input type="number" id="d_mu" placeholder="0" oninput="calc()"></div>
             <div><label>도감(%)</label><input type="number" id="d_dogam" placeholder="0" oninput="calc()"></div>
@@ -111,7 +111,7 @@
             <div><label>건물+펫(기본81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()"></div>
             <div><label>이외(합연산)</label><input type="number" id="cp_etc" placeholder="0" oninput="calc()"></div>
         </div>
-        <hr><label style="text-align:center; margin-bottom:5px;">[치피 곱연산 % 세분화]</label>
+        <hr><label style="text-align:center; margin-bottom:5px;">[치피 탈것 및 도감]</label>
         <div class="row">
             <div><label>도감(곱 %)</label><input type="number" id="cp_mult_dogam" placeholder="0" oninput="calc()"></div>
             <div><label>탈것+탈것장비(곱 %)</label><input type="number" id="cp_mult_ride" placeholder="0" oninput="calc()"></div>
@@ -124,7 +124,7 @@
             <div><label>A: 승전 버프(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()"></div>
             <div><label>D: 이외(곱연산 %)</label><input type="number" id="sp_d" placeholder="0" oninput="calc()"></div>
         </div>
-        <hr><label style="text-align:center; margin-bottom:5px;">[종족 B+C 합연산 세분화]</label>
+        <hr><label style="text-align:center; margin-bottom:5px;">[종족 탈것 및 도감]</label>
         <div class="row">
             <div><label>탈것+탈것장비(%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()"></div>
             <div><label>도감(%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()"></div>
