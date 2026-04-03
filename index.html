@@ -62,7 +62,7 @@
                 <button class="u-btn" data-type="neck" data-val="20" onclick="toggleUnique(this)">용의 목걸이</button>
             </div>
             <div id="wind-input-area" style="display:none; background: #111; padding: 10px; border-radius: 5px; margin-top:10px;">
-                <label style="color:var(--unique);">🍃 현재 이속 변수 설정</label>
+                <label style="color:var(--unique);">🥏 현재 이속 변수 설정</label>
                 <div class="row">
                     <div><label>헌터 등급</label><select id="ms_hunter" onchange="calc()"><option value="30">울티(30%)</option><option value="20">레전(20%)</option><option value="10">히로익(10%)</option></select></div>
                     <div><label>성격</label><select id="ms_personality" onchange="calc()"><option value="0">없음(0%)</option><option value="7">영웅심리(7%)</option><option value="10">달리기가빠른(10%)</option></select></div>
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <div class="section-title">공격력 항목</div>
+    <div class="section-title">⚔️공격력 항목</div>
     <div class="card">
         <label style="color:white; display:flex; align-items:center; cursor:pointer; margin-bottom:10px; background:#444; padding:5px; border-radius:4px;">
             <input type="checkbox" id="a_carve" onchange="calc()" style="width:auto; margin-right:8px;"> 무기 각인 활성화 (107%)
@@ -126,7 +126,7 @@
         </div>
     </div>
 
-    <div class="row"><div class="section-title">치명타 피해량</div><div class="section-title">종족 피해량</div></div>
+    <div class="row"><div class="section-title">🗡️치명타 피해량</div><div class="section-title">🧛‍♂️종족 피해량</div></div>
     <div class="card row">
         <div style="border-right:1px solid #444; padding-right:8px;">
             <label>건물+펫(81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()">
@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    <div class="section-title">🛡️ 증폭 설정 (합연산)</div>
+    <div class="section-title">📈 증폭 설정 (합연산)</div>
     <div class="card">
         <div class="row">
             <div><label>강철돌격대 고삐</label><select id="amp_bridle" onchange="calc()"><option value="0">OFF (0%)</option><option value="10">ON (10%)</option></select></div>
@@ -148,7 +148,7 @@
         </div>
     </div>
 
-    <div class="section-title">📦 현재 장비 + 룬 상세</div>
+    <div class="section-title">⚖️ 현재 장비 + 룬 상세</div>
     <div class="card">
         <div class="row">
             <div><label>전공 장비</label><input type="number" id="cur_atk_eq" placeholder="0" oninput="calc()"></div>
@@ -163,7 +163,7 @@
             <div><label>종족 룬(Max +28%)</label><input type="number" id="cur_sp_rune" placeholder="28" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div style="grid-column: span 2;"><label>현재 총 증폭% (유니크 포함)</label><input type="number" id="cur_amp" value="0" readonly style="border:1px solid var(--unique); color:var(--unique);"></div>
+            <div style="grid-column: span 2;"><label>현재 총 증폭% (자동 계산)</label><input type="number" id="cur_amp" value="0" readonly style="border:1px solid var(--unique); color:var(--unique);"></div>
         </div>
     </div>
 
@@ -181,7 +181,7 @@
         <div id="dynamic-swap-box" style="display:none; margin-top:10px; background:#111; padding:12px; border-radius:8px; border:1px dashed var(--unique);">
             <div id="swap-tool-content"></div>
         </div>
-        <button class="btn" style="background:#c0392b; margin-top:10px;" onclick="resetSim()">🧹 시뮬레이션 초기화</button>
+        <button class="btn" style="background:#c0392b; margin-top:10px;" onclick="resetSim()">🔧 시뮬레이션 초기화</button>
     </div>
 
     <button class="btn" onclick="toggleElement('log-box')">📊 상세 계산 로직 확인</button>
@@ -278,8 +278,8 @@
             content.innerHTML = `
                 <div style="font-size:0.8rem; color:var(--unique); text-align:center; margin-bottom:10px;">[현재 질풍신 → 블피 스왑 시 효율]</div>
                 <div class="btn-group">
-                    <button class="s-btn ${simBloodVal===250?'active':''}" onclick="simBloodVal=250; openSwapTool()">블피(+250)</button>
-                    <button class="s-btn ${simBloodVal===300?'active':''}" onclick="simBloodVal=300; openSwapTool()">진 블피(+300)</button>
+                    <button class="s-btn ${simBloodVal===250?'active':''}" onclick="simBloodVal=250; openSwapTool()">블피(+250%)</button>
+                    <button class="s-btn ${simBloodVal===300?'active':''}" onclick="simBloodVal=300; openSwapTool()">진 블피(+300%)</button>
                 </div>
                 <button class="btn" style="background:var(--unique);" onclick="applySwap('toBlood')">시뮬레이션 적용</button>`;
         } else {
