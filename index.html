@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⚔️이헌타 정밀 계산기 v2.13</title>
+    <title>⚔️이헌타 정밀 계산기 v2.14</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; --unique: #ff9800; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -395,19 +395,19 @@
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px;">
     <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #ff5252;">
         <span style="color:#aaa; font-size:0.7rem;">공격력 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(100 / (mode === 'village' ? (cur.B + cur.C) : cur.B) * 1).toFixed(3)}%</span>
+        <span style="color:#fff;">+${(1 / (mode === 'village' ? (cur.B + cur.C) : cur.B) * 100).toFixed(3)}%</span>
     </div>
     <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #00e676;">
         <span style="color:#aaa; font-size:0.7rem;">치명피해 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(100 / (cur.cp * 100) * 100).toFixed(3)}%</span>
+        <span style="color:#fff;">+${(1 / cur.cp * 100).toFixed(3)}%</span>
     </div>
     <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #f39c12;">
         <span style="color:#aaa; font-size:0.7rem;">증폭 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(100 / (cur.amp * 100) * 100).toFixed(3)}%</span>
+        <span style="color:#fff;">+${(1 / cur.amp * 100).toFixed(3)}%</span>
     </div>
     <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #3498db;">
         <span style="color:#aaa; font-size:0.7rem;">종족피해 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(100 / (cur.sp * 100) * 100).toFixed(3)}%</span>
+        <span style="color:#fff;">+${(1 / cur.sp * 100).toFixed(3)}%</span>
     </div>
 </div>
 <div style="margin-top:8px; font-size:0.7rem; color:#888;">
