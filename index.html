@@ -367,7 +367,8 @@
         document.getElementById('eff_out').style.color = (Math.abs(diff) < 0.001) ? '#00e676' : (diff > 0 ? '#00e676' : '#ff5252');
 
  // 상세 로직 및 가치 분석 업데이트 (이 전체 내용을 교체하세요)
-       <b>[1. 공격력 상세 로직]</b>
+       document.getElementById('log-box').innerHTML = `
+<b>[1. 공격력 상세 로직]</b>
 공식: ${mode === 'village' ? '각인 * A * (B+C) * D * E' : 'B * D * E'}
 • 각인: ${carveVal.toFixed(2)} | A: (100 + 승전 : ${v('a_win')} + 지던 : ${v('a_dungeon')})% = ${cur.A.toFixed(3)}
 • B: (100 + 헌터등급 : ${v('b_hunter')} + 헌터스텟 : ${v('b_stat')} + 연합버프 : ${v('b_uni')} + 비법 : ${v('b_etc')})% = ${cur.B.toFixed(3)}
@@ -377,7 +378,7 @@
 ▶ 최종 공격력 계수: ${cur.atk.toFixed(5)} ${v('n_atk') !== 0 ? '→ (비교) ' + next.atk.toFixed(5) : ''}
 
 <b>[2. 배율 상세 로직]</b>
-• 치피: [기본175 + 합${(v('cp_base')+v('cur_cp_eq')+v('cur_cp_rune'))}] * 도감(${((100+v('cp_dogam'))/100).toFixed(2)}) * 탈것(${((100+v('cp_ride'))/100).toFixed(2)})
+• 치피: [기본175 + 건물,펫,장비,룬 합${(v('cp_base')+v('cur_cp_eq')+v('cur_cp_rune'))}] * 도감(${((100+v('cp_dogam'))/100).toFixed(2)}) * 탈것(${((100+v('cp_ride'))/100).toFixed(2)})
   = ${cur.cp.toFixed(3)}배 ${v('n_cp') !== 0 ? '→ (비교) ' + next.cp.toFixed(3) + '배' : ''}
 • 종족: [기본100 + 합${(v('sp_win')+v('cur_sp_eq')+v('cur_sp_rune'))}] * 도감(${((100+v('sp_dogam'))/100).toFixed(2)}) * 탈것(${((100+v('sp_ride'))/100).toFixed(2)})
   = ${cur.sp.toFixed(3)}배 ${v('n_sp') !== 0 ? '→ (비교) ' + next.sp.toFixed(3) + '배' : ''}
@@ -387,32 +388,10 @@
 <b>[3. 최종 계산 결과]</b>
 • 현재: ${cur.atk.toFixed(4)} * ${cur.cp.toFixed(3)} * ${cur.sp.toFixed(3)} * ${cur.amp.toFixed(3)} = ${(cur.final*1000).toFixed(0)}
 • 비교: ${next.atk.toFixed(4)} * ${next.cp.toFixed(3)} * ${next.sp.toFixed(3)} * ${next.amp.toFixed(3)} = ${(next.final*1000).toFixed(0)}
-• 효율 차이: <b>${diff.toFixed(4)}%</b>
+• 효율 차이: <b>${diff.toFixed(4)}%</b>`;
+    }
 
-<hr style="border:0; border-top:1px dashed #444; margin:10px 0;">
-
-<b>[4. 가치 분석 (현재 스탯 대비 1%당 효율)]</b>
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px;">
-    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #ff5252;">
-        <span style="color:#aaa; font-size:0.7rem;">공격력 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(1 / (mode === 'village' ? (cur.B + cur.C) : cur.B) * 100).toFixed(3)}%</span>
-    </div>
-    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #00e676;">
-        <span style="color:#aaa; font-size:0.7rem;">치명피해 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(1 / cur.cp * 100).toFixed(3)}%</span>
-    </div>
-    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #f39c12;">
-        <span style="color:#aaa; font-size:0.7rem;">증폭 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(1 / cur.amp * 100).toFixed(3)}%</span>
-    </div>
-    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #3498db;">
-        <span style="color:#aaa; font-size:0.7rem;">종족피해 1% 증가 시</span><br>
-        <span style="color:#fff;">+${(1 / cur.sp * 100).toFixed(3)}%</span>
-    </div>
-</div>
-<div style="margin-top:8px; font-size:0.7rem; color:#888;">
-    * 위 수치가 높을수록 해당 옵션을 올렸을 때의 실질 데미지 상승 폭이 큽니다.
-</div>
+    window.onload = () => { changeMode(); calc(); };
         
 </script>
 </body>
