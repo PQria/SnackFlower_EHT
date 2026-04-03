@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이헌타 정밀 계산기 v2.7</title>
+    <title>이헌타 정밀 계산기 v7.1</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; --unique: #ff9800; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -19,7 +19,7 @@
         .u-btn, .s-btn { flex: 1; min-width: 60px; padding: 8px 4px; font-size: 0.7rem; background: #444; border: 1px solid #555; color: #fff; cursor: pointer; border-radius: 4px; }
         .u-btn.active, .s-btn.active { background: var(--unique); border-color: #fff; font-weight: bold; }
         .eff { font-size: 1.4rem; color: var(--accent); font-weight: bold; margin-top: 5px; }
-        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.75rem; border: 1px solid #444; color: #00ff41; line-height: 1.6; }
+        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.75rem; border: 1px solid #444; color: #00ff41; line-height: 1.6; white-space: pre-wrap; }
         .btn { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
         .notice { background: #3e2723; color: #ffab91; padding: 10px; border-radius: 5px; font-size: 0.8rem; border: 1px solid #d84315; margin-bottom: 15px; }
     </style>
@@ -43,9 +43,8 @@
 <div class="container">
     <div class="section-title">📢 유의사항 및 공지</div>
     <div class="notice">
-        1. 유니크 스왑 시뮬레이터는 착용 중인 장비를 바꾸면 <b>자동으로 구성이 변경</b>됩니다.<br>
-        2. 블피 선택 시 효율이 떨어지는 현상을 해결했습니다 (현재 상태 격리 완료).<br>
-        3. 상세 로그에서 각 항목의 계산 과정을 수식으로 확인할 수 있습니다.
+        유니크 선택 시 효율이 변하지 않도록 격리되었습니다. <br>
+        스왑 도구는 현재 착용 장비에 따라 실시간으로 인터페이스가 변경됩니다.
     </div>
 
     <button class="btn" style="border: 1px solid var(--unique); color: var(--unique); background:#222;" onclick="toggleElement('unique-section')">💎 현재 착용 유니크 설정</button>
@@ -63,6 +62,10 @@
                 <div class="row">
                     <div><label>헌터등급</label><select id="ms_hunter" onchange="calc()"><option value="30">울티</option><option value="20">레전</option></select></div>
                     <div><label>건물이속</label><input type="number" id="ms_build" placeholder="50" oninput="calc()"></div>
+                </div>
+                <div class="row">
+                    <div><label>코스튬(40)</label><select id="ms_cos" onchange="calc()"><option value="40">ON</option><option value="0">OFF</option></select></div>
+                    <div><label>날개(20)</label><select id="ms_wing" onchange="calc()"><option value="20">ON</option><option value="0">OFF</option></select></div>
                 </div>
                 <div class="row">
                     <div><label>질풍신 옵%</label><input type="number" id="ms_wind_rate" placeholder="10" oninput="calc()"></div>
@@ -92,15 +95,36 @@
         </div>
     </div>
 
+    <div class="row"><div class="section-title">치명타 피해량</div><div class="section-title">종족 피해량</div></div>
+    <div class="card row">
+        <div style="border-right:1px solid #444; padding-right:8px;">
+            <label>건물+펫(81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()">
+            <label>도감(곱%)</label><input type="number" id="cp_dogam" placeholder="0" oninput="calc()">
+            <label>탈것(곱%)</label><input type="number" id="cp_ride" placeholder="0" oninput="calc()">
+        </div>
+        <div>
+            <label>승전(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()">
+            <label>도감(곱%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()">
+            <label>탈것(곱%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()">
+        </div>
+    </div>
+
     <div class="section-title">📦 현재 장비 + 룬 상세</div>
     <div class="card">
         <div class="row">
-            <div><label>공격력 합</label><input type="number" id="cur_atk_sum" placeholder="24" oninput="calc()"></div>
-            <div><label>치피 합</label><input type="number" id="cur_cp_sum" placeholder="28" oninput="calc()"></div>
+            <div><label>전공 장비</label><input type="number" id="cur_atk_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>전공 룬</label><input type="number" id="cur_atk_rune" placeholder="24" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>종족 합</label><input type="number" id="cur_sp_sum" placeholder="28" oninput="calc()"></div>
-            <div><label>현재 증폭%</label><input type="number" id="cur_amp" value="0" readonly style="border:1px solid var(--unique); color:var(--unique);"></div>
+            <div><label>치피 장비</label><input type="number" id="cur_cp_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>치피 룬</label><input type="number" id="cur_cp_rune" placeholder="28" oninput="calc()"></div>
+        </div>
+        <div class="row">
+            <div><label>종족 장비</label><input type="number" id="cur_sp_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>종족 룬</label><input type="number" id="cur_sp_rune" placeholder="28" oninput="calc()"></div>
+        </div>
+        <div class="row">
+            <div style="grid-column: span 2;"><label>현재 증폭%</label><input type="number" id="cur_amp" value="0" readonly style="border:1px solid var(--unique); color:var(--unique);"></div>
         </div>
     </div>
 
@@ -151,7 +175,6 @@
         }
         document.getElementById('wind-input-area').style.display = Array.from(document.querySelectorAll('.u-btn.active')).some(b => b.innerText.includes("질풍신")) ? 'block' : 'none';
         
-        // 스왑 도구가 열려있다면 자동으로 내용 갱신
         if(document.getElementById('dynamic-swap-box').style.display === 'block') openSwapTool();
         calc();
     }
@@ -161,26 +184,30 @@
         const content = document.getElementById('swap-tool-content');
         const activeNames = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
         
-        const hasBlood = activeNames.some(t => t.includes("블피"));
+        const hasBlood = activeNames.some(t => t.includes("블피") || t.includes("블러드"));
         const hasWind = activeNames.some(t => t.includes("질풍신"));
 
         if(hasBlood && hasWind) {
             content.innerHTML = `<div style="color:#ff5252; text-align:center;">블피와 질풍신을 모두 착용 중입니다.</div>`;
         } else if(hasBlood) {
             content.innerHTML = `
-                <div style="font-size:0.8rem; color:var(--unique); text-align:center; margin-bottom:10px;">[블피 → 질풍신 스왑]</div>
+                <div style="font-size:0.8rem; color:var(--unique); text-align:center; margin-bottom:10px;">[블피 → 질풍신 스왑 시뮬]</div>
                 <div class="btn-group">
                     <button class="s-btn ${simWindLimit===30?'active':''}" onclick="simWindLimit=30; openSwapTool()">질풍신(30)</button>
                     <button class="s-btn ${simWindLimit===40?'active':''}" onclick="simWindLimit=40; openSwapTool()">진 질풍신(40)</button>
                 </div>
                 <div class="row">
-                    <div><label>헌터등급</label><select id="s_h"><option value="30">울티</option><option value="20">레전</option></select></div>
+                    <div><label>헌터이속</label><select id="s_h"><option value="30">울티</option><option value="20">레전</option></select></div>
                     <div><label>건물이속</label><input type="number" id="s_b" value="50"></div>
+                </div>
+                <div class="row">
+                    <div><label>코스튬</label><select id="s_cos"><option value="40">ON</option><option value="0">OFF</option></select></div>
+                    <div><label>날개</label><select id="s_wing"><option value="20">ON</option><option value="0">OFF</option></select></div>
                 </div>
                 <button class="btn" style="background:var(--unique);" onclick="applySwap('toWind')">시뮬레이션 적용</button>`;
         } else if(hasWind) {
             content.innerHTML = `
-                <div style="font-size:0.8rem; color:var(--unique); text-align:center; margin-bottom:10px;">[질풍신 → 블피 스왑]</div>
+                <div style="font-size:0.8rem; color:var(--unique); text-align:center; margin-bottom:10px;">[질풍신 → 블피 스왑 시뮬]</div>
                 <div class="btn-group">
                     <button class="s-btn ${simBloodVal===250?'active':''}" onclick="simBloodVal=250; openSwapTool()">블피(+250)</button>
                     <button class="s-btn ${simBloodVal===300?'active':''}" onclick="simBloodVal=300; openSwapTool()">진 블피(+300)</button>
@@ -195,7 +222,7 @@
     function applySwap(mode) {
         const activeNames = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
         if(mode === 'toWind') {
-            const ms = parseFloat(document.getElementById('s_h').value) + parseFloat(document.getElementById('s_b').value) + 210;
+            const ms = parseFloat(document.getElementById('s_h').value) + parseFloat(document.getElementById('s_b').value) + parseFloat(document.getElementById('s_cos').value) + parseFloat(document.getElementById('s_wing').value) + 150; 
             const amp = Math.min(ms * 0.1, simWindLimit);
             document.getElementById('n_cp').value = activeNames.some(t => t.includes("진 블피")) ? -300 : -250;
             document.getElementById('n_amp').value = amp.toFixed(1);
@@ -222,61 +249,69 @@
         const mode = document.getElementById('calc_mode').value;
         const carve = document.getElementById('a_carve').checked ? 107 : 100;
 
-        // 현재 유니크 상태 파악 (현재 데미지 계산용)
         let cur_u_cp = 0, cur_u_amp = 0;
         document.querySelectorAll('.u-btn.active').forEach(btn => {
             const type = btn.getAttribute('data-type');
-            const val = parseFloat(btn.getAttribute('data-val'));
-            if(type === 'blood') cur_u_cp = val;
+            if(type === 'blood') cur_u_cp = parseFloat(btn.getAttribute('data-val'));
             if(type === 'neck') cur_u_amp += 20;
             if(type === 'wind') {
-                const ms = v('ms_hunter') + v('ms_build') + v('ms_eq_sum') + 210; // 기본이속 합산
-                cur_u_amp += Math.min(ms * (v('ms_wind_rate') || 10) / 100, val);
+                const ms = v('ms_hunter') + v('ms_build') + v('ms_cos') + v('ms_wing') + v('ms_eq_sum') + 115;
+                cur_u_amp += Math.min(ms * (v('ms_wind_rate') || 10) / 100, parseFloat(btn.getAttribute('data-val')));
             }
         });
         document.getElementById('cur_amp').value = cur_u_amp.toFixed(1);
 
-        const getStats = (isNext) => {
+        const run = (isNext) => {
             const A = (100 + v('a_win') + v('a_dungeon')) / 100;
-            const B = (v('b_uni') + v('b_etc'));
-            const C = v('c_val');
-            const D = v('d_sum');
+            const BCD = (100 + v('b_uni') + v('b_etc') + v('c_val') + v('d_sum') + v('cur_atk_eq') + v('cur_atk_rune') + (isNext ? v('n_atk') : 0)) / 100;
             const E = (100 + v('e_fairy')) / 100;
-            const gearAtk = v('cur_atk_sum') + (isNext ? v('n_atk') : 0);
-            
-            const totalAtk = (mode === 'village' ? carve * A : carve) * (100 + B + C + D + gearAtk) / 100 * E;
-            
-            const totalCp = (175 + v('cp_base') + v('cur_cp_sum') + (isNext ? v('n_cp') : cur_u_cp)) * (100 + v('cp_dogam') + v('cp_ride')) / 10000;
-            const totalSp = 100 * (100 + v('cur_sp_sum') + (isNext ? v('n_sp') : 0)) / 100 * (100 + v('sp_dogam') + v('sp_ride')) / 100 * (100 + v('sp_win')) / 10000;
-            const totalAmp = (100 + v('cur_amp') + (isNext ? v('n_amp') : 0)) / 100;
+            const atk = (mode === 'village' ? carve * A : carve) * BCD * E;
 
-            return { final: totalAtk * totalCp * totalSp * totalAmp, atk: totalAtk, cp: totalCp, sp: totalSp, amp: totalAmp, raw: { A, B, C, D, E, gearAtk } };
+            const cpTotal = (175 + v('cp_base') + v('cur_cp_eq') + v('cur_cp_rune') + (isNext ? v('n_cp') : cur_u_cp));
+            const cpRate = (100 + v('cp_dogam') + v('cp_ride')) / 100;
+            const finalCp = (cpTotal * cpRate) / 100;
+
+            const spBase = (100 + v('cur_sp_eq') + v('cur_sp_rune') + (isNext ? v('n_sp') : 0));
+            const spRate = (100 + v('sp_dogam') + v('sp_ride')) / 100 * (100 + v('sp_win')) / 100;
+            const finalSp = (spBase * spRate) / 100;
+
+            const finalAmp = (100 + v('cur_amp') + (isNext ? v('n_amp') : 0)) / 100;
+
+            return { final: atk * finalCp * finalSp * finalAmp, atk, cp: finalCp, sp: finalSp, amp: finalAmp, rawCp: cpTotal, rawSp: spBase };
         };
 
-        const cur = getStats(false);
-        const next = getStats(true);
+        const cur = run(false);
+        const next = run(true);
 
         document.getElementById('cur_d').innerText = Math.floor(cur.final).toLocaleString();
         document.getElementById('next_d').innerText = Math.floor(next.final).toLocaleString();
         const diff = ((next.final / cur.final) - 1) * 100;
-        const out = document.getElementById('eff_out');
-        out.innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
-        out.style.color = diff >= 0 ? '#00e676' : '#ff5252';
+        document.getElementById('eff_out').innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
+        document.getElementById('eff_out').style.color = diff >= 0 ? '#00e676' : '#ff5252';
 
-        // 로그 출력
         document.getElementById('log-box').innerHTML = `
-<b>[공격력(Atk)]</b><br>
-- 현재: ${carve} * A(${cur.raw.A}) * BCD(${100+cur.raw.B+cur.raw.C+cur.raw.D}+${v('cur_atk_sum')})% * E(${cur.raw.E}) = ${cur.atk.toFixed(1)}<br>
-- 비교: ${carve} * A(${next.raw.A}) * BCD(${100+next.raw.B+next.raw.C+next.raw.D}+${v('cur_atk_sum')+v('n_atk')})% * E(${next.raw.E}) = ${next.atk.toFixed(1)}<br>
-<hr>
-<b>[치피/종족/증폭 배율]</b><br>
-- 현재: 치피 ${cur.cp.toFixed(2)}배 | 종족 ${cur.sp.toFixed(2)}배 | 증폭 ${cur.amp.toFixed(2)}배<br>
-- 비교: 치피 ${next.cp.toFixed(2)}배 | 종족 ${next.sp.toFixed(2)}배 | 증폭 ${next.amp.toFixed(2)}배<br>
-<hr>
-<b>[최종 결과]</b><br>
-- 현재 데미지: ${Math.floor(cur.final).toLocaleString()}<br>
-- 비교 데미지: ${Math.floor(next.final).toLocaleString()}<br>
-- 최종 효율: <b>${diff.toFixed(4)}%</b>`;
+<b>[공격력(Atk)]</b>
+현재: ${atkLog(cur)} = ${cur.atk.toFixed(1)}
+비교: ${atkLog(next)} = ${next.atk.toFixed(1)}
+
+<b>[치명타 피해(Crit)]</b>
+현재: (${cur.rawCp}% * ${v('cp_dogam')+v('cp_ride')}%증가) = ${cur.cp.toFixed(2)}배
+비교: (${next.rawCp}% * ${v('cp_dogam')+v('cp_ride')}%증가) = ${next.cp.toFixed(2)}배
+
+<b>[종족 피해(Species)]</b>
+현재: (${cur.rawSp}% * 종족증가) = ${cur.sp.toFixed(2)}배
+비교: (${next.rawSp}% * 종족증가) = ${next.sp.toFixed(2)}배
+
+<b>[증폭(Amp)]</b>
+현재: (100 + ${v('cur_amp')})% = ${cur.amp.toFixed(2)}배
+비교: (100 + ${v('cur_amp')+v('n_amp')})% = ${next.amp.toFixed(2)}배
+
+<b>[결과]</b>
+최종 효율: ${diff.toFixed(4)}%`;
+    }
+
+    function atkLog(res) {
+        return `A * BCD * E`;
     }
 
     window.onload = () => { changeMode(); calc(); };
