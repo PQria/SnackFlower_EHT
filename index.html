@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이헌타 정밀 계산기 v7.4</title>
+    <title>이헌타 정밀 계산기 v7.5</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; --unique: #ff9800; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -119,11 +119,13 @@
     <div class="card row">
         <div style="border-right:1px solid #444; padding-right:8px;">
             <label>건물+펫(81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()">
-            <label>도감/탈것(곱%)</label><input type="number" id="cp_mul" placeholder="0" oninput="calc()">
+            <label>도감(곱%)</label><input type="number" id="cp_dogam" placeholder="0" oninput="calc()">
+            <label>탈것(곱%)</label><input type="number" id="cp_ride" placeholder="0" oninput="calc()">
         </div>
         <div>
             <label>승전(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()">
-            <label>도감/탈것(곱%)</label><input type="number" id="sp_mul" placeholder="0" oninput="calc()">
+            <label>도감(곱%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()">
+            <label>탈것(곱%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()">
         </div>
     </div>
 
@@ -169,6 +171,7 @@
 
 <script>
     let simWindLimit = 40;
+    let simBloodVal = 300;
 
     function v(id) {
         const el = document.getElementById(id);
@@ -249,8 +252,8 @@
             content.innerHTML = `
                 <div style="font-size:0.8rem; color:var(--unique); text-align:center; margin-bottom:10px;">[질풍신 → 블피 스왑]</div>
                 <div class="btn-group">
-                    <button class="s-btn" id="s_b250" onclick="simBloodVal=250; selectBlood(250)">블피(+250)</button>
-                    <button class="s-btn active" id="s_b300" onclick="simBloodVal=300; selectBlood(300)">진 블피(+300)</button>
+                    <button class="s-btn ${simBloodVal===250?'active':''}" onclick="simBloodVal=250; openSwapTool()">블피(+250)</button>
+                    <button class="s-btn ${simBloodVal===300?'active':''}" onclick="simBloodVal=300; openSwapTool()">진 블피(+300)</button>
                 </div>
                 <button class="btn" style="background:var(--unique);" onclick="applySwap('toBlood')">시뮬레이션 적용</button>`;
         } else {
@@ -259,23 +262,18 @@
         box.style.display = 'block';
     }
 
-    function selectBlood(val) {
-        document.getElementById('s_b250').classList.toggle('active', val===250);
-        document.getElementById('s_b300').classList.toggle('active', val===300);
-        simBloodVal = val;
-    }
-
     function applySwap(mode) {
         const activeNames = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
         if(mode === 'toWind') {
             const ms = v('s_ms_h') + v('s_ms_p') + v('s_ms_b') + v('s_ms_s') + v('s_ms_c') + v('s_ms_w') + v('s_ms_i') + v('s_ms_r') + v('s_ms_f') + v('s_ms_d') + v('s_ms_eq') + v('s_ms_ru') + 15;
             const amp = Math.min(ms * (v('ms_wind_rate')||10) / 100, simWindLimit);
-            document.getElementById('n_cp').value = activeNames.some(t => t.includes("진 블피")) ? -300 : -250;
+            const bloodVal = activeNames.some(t => t.includes("진 블피")) ? -300 : -250;
+            document.getElementById('n_cp').value = bloodVal;
             document.getElementById('n_amp').value = amp.toFixed(1);
         } else {
             const curAmp = parseFloat(document.getElementById('cur_amp').value);
             document.getElementById('n_amp').value = -(curAmp - (activeNames.some(t => t.includes("목걸이"))?20:0));
-            document.getElementById('n_cp').value = (typeof simBloodVal === 'undefined' ? 300 : simBloodVal);
+            document.getElementById('n_cp').value = simBloodVal;
         }
         calc();
     }
@@ -300,32 +298,40 @@
         document.getElementById('cur_amp').value = cur_u_amp.toFixed(1);
 
         const run = (isNext) => {
+            let atk = 0;
             const A = (100 + v('a_win') + v('a_dungeon')) / 100;
             const B = (100 + v('b_hunter') + v('b_stat') + v('b_uni') + v('b_etc')) / 100;
             const C = (100 + v('c_build') + v('c_shingang') + v('cur_atk_eq') + v('cur_atk_rune') + (isNext ? v('n_atk') : 0)) / 100;
             const D = (1 + (v('d_cos') + v('d_dogam') + v('d_seal') + v('d_etc'))/100);
             const E = (1 + v('e_fairy')/100);
-            const atk = (mode === 'village' ? carve * A : carve) * B * C * D * E;
+
+            if (mode === 'village') {
+                // 마을/보스: 각인 * A * (B + C) * D * E
+                atk = (carve/100) * A * (B + C - 1) * D * E;
+            } else {
+                // 콜로세움: B * D * E (곱연산)
+                atk = B * D * E;
+            }
 
             const cpTotal = (175 + v('cp_base') + v('cur_cp_eq') + v('cur_cp_rune') + (isNext ? v('n_cp') : 0));
-            const cpRate = (100 + v('cp_mul')) / 100;
+            const cpRate = (100 + v('cp_dogam')) / 100 * (100 + v('cp_ride')) / 100;
             const finalCp = (cpTotal * cpRate) / 100;
 
             const spBase = (100 + v('sp_win') + v('cur_sp_eq') + v('cur_sp_rune') + (isNext ? v('n_sp') : 0));
-            const spRate = (100 + v('sp_mul')) / 100;
+            const spRate = (100 + v('sp_dogam')) / 100 * (100 + v('sp_ride')) / 100;
             const finalSp = (spBase * spRate) / 100;
 
             const ampVal = (isNext ? (cur_u_amp + v('n_amp')) : cur_u_amp);
             const finalAmp = (100 + ampVal) / 100;
 
-            return { final: atk * finalCp * finalSp * finalAmp, atk, cp: finalCp, sp: finalSp, amp: finalAmp, rawCp: cpTotal, rawSp: spBase, ampVal };
+            return { final: atk * finalCp * finalSp * finalAmp, atk, cp: finalCp, sp: finalSp, amp: finalAmp };
         };
 
         const cur = run(false);
         const next = run(true);
 
-        document.getElementById('cur_d').innerText = Math.floor(cur.final).toLocaleString();
-        document.getElementById('next_d').innerText = Math.floor(next.final).toLocaleString();
+        document.getElementById('cur_d').innerText = Math.floor(cur.final * 1000).toLocaleString(); // 가독성을 위해 배율 조정
+        document.getElementById('next_d').innerText = Math.floor(next.final * 1000).toLocaleString();
         
         const isSim = v('n_atk')||v('n_cp')||v('n_amp')||v('n_sp');
         const diff = isSim ? (((next.final / cur.final) - 1) * 100) : 0;
@@ -333,9 +339,9 @@
         document.getElementById('eff_out').style.color = (diff === 0) ? '#00e676' : (diff > 0 ? '#00e676' : '#ff5252');
 
         document.getElementById('log-box').innerHTML = `
-<b>[공격력 로직: A * B * C * D * E]</b>
-- 현재: ${carve}% * A(${((100+v('a_win')+v('a_dungeon'))/100).toFixed(2)}) * B(${((100+v('b_hunter')+v('b_stat')+v('b_uni')+v('b_etc'))/100).toFixed(2)}) * C(${((100+v('c_build')+v('c_shingang')+v('cur_atk_eq')+v('cur_atk_rune'))/100).toFixed(2)}) * D(${(1+(v('d_cos')+v('d_dogam')+v('d_seal')+v('d_etc'))/100).toFixed(2)}) * E(${(1+v('e_fairy')/100).toFixed(2)}) = ${cur.atk.toFixed(1)}
-- 비교: ${carve}% * A * B * C_Sim * D * E = ${next.atk.toFixed(1)}
+<b>[공격력 로직: ${mode === 'village' ? '각인 * A * (B+C) * D * E' : 'B * D * E'}]</b>
+- 현재: ${cur.atk.toFixed(4)}
+- 비교: ${next.atk.toFixed(4)}
 
 <b>[배율 결과]</b>
 - 현재: 치피 ${cur.cp.toFixed(2)}배 | 종족 ${cur.sp.toFixed(2)}배 | 증폭 ${cur.amp.toFixed(2)}배
