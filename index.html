@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이헌타 정밀 계산기 v6.0 - 유니크 분석</title>
+    <title>이헌타 정밀 계산기 v1.8</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; --unique: #ff9800; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -12,15 +12,16 @@
         .section-title { font-weight: bold; color: var(--accent); margin: 15px 0 5px; font-size: 0.9rem; }
         .card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         label { font-size: 0.7rem; color: #aaa; display: block; margin-bottom: 2px; }
         input, select { width: 100%; background: #333; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
         .btn-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
         .u-btn { flex: 1; min-width: 80px; padding: 10px 5px; font-size: 0.75rem; background: #444; border: 1px solid #555; color: #fff; cursor: pointer; border-radius: 4px; }
         .u-btn.active { background: var(--unique); border-color: #fff; font-weight: bold; }
         .eff { font-size: 1.4rem; color: var(--accent); font-weight: bold; margin-top: 5px; }
-        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; border: 1px solid #444; color: #00ff41; line-height: 1.6; }
+        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; border: 1px solid #444; color: #00ff41; overflow-x: auto; line-height: 1.6; }
         .btn { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
-        .sim-btn { background: #2c3e50; border: 1px solid var(--unique); color: var(--unique); }
+        .u-toggle-btn { background: #222; border: 1px solid var(--unique); color: var(--unique); margin-bottom: 15px; }
         hr { border: 0; border-top: 1px solid #444; margin: 10px 0; }
     </style>
 </head>
@@ -41,44 +42,48 @@
 </div>
 
 <div class="container">
-    <div class="section-title" style="color:var(--unique);">💎 사용 유니크 선택 (최대 2개)</div>
-    <div class="card">
-        <div class="btn-group" id="unique-btns">
-            <button class="u-btn" data-type="blood" data-val="250" onclick="toggleUnique(this)">블러드피스트</button>
-            <button class="u-btn" data-type="blood" data-val="300" onclick="toggleUnique(this)">진 블피</button>
-            <button class="u-btn" data-type="wind" data-val="30" onclick="toggleUnique(this)">질풍신</button>
-            <button class="u-btn" data-type="wind" data-val="40" onclick="toggleUnique(this)">진 질풍신</button>
-            <button class="u-btn" data-type="neck" data-val="20" onclick="toggleUnique(this)">용의 목걸이</button>
-        </div>
-        <div id="wind-settings" style="display:none; border-top: 1px solid #555; padding-top: 10px;">
-            <label style="color:var(--unique); font-weight:bold;">🍃 질풍신 이속 상세 설정</label>
-            <div class="row">
-                <div><label>헌터 등급</label><select id="ms_hunter" onchange="calc()"><option value="0">일반(0%)</option><option value="10">히로익(10%)</option><option value="20">레전(20%)</option><option value="30">울티(30%)</option></select></div>
-                <div><label>건물 이속(0~50)</label><input type="number" id="ms_build" placeholder="50" oninput="calc()"></div>
+    <button class="btn u-toggle-btn" onclick="toggleElement('unique-section')">💎 유니크 비교 기능 사용 (열기/닫기)</button>
+    
+    <div id="unique-section" style="display:none; margin-bottom: 20px;">
+        <div class="section-title" style="color:var(--unique);">유니크 장비 선택 (최대 2개)</div>
+        <div class="card" style="border: 1px solid var(--unique);">
+            <div class="btn-group">
+                <button class="u-btn" data-type="blood" data-val="250" onclick="toggleUnique(this)">블러드피스트</button>
+                <button class="u-btn" data-type="blood" data-val="300" onclick="toggleUnique(this)">진 블피</button>
+                <button class="u-btn" data-type="wind" data-val="30" onclick="toggleUnique(this)">질풍신</button>
+                <button class="u-btn" data-type="wind" data-val="40" onclick="toggleUnique(this)">진 질풍신</button>
+                <button class="u-btn" data-type="neck" data-val="20" onclick="toggleUnique(this)">용의 목걸이</button>
             </div>
-            <div class="row">
-                <div><label>성격</label><select id="ms_per" onchange="calc()"><option value="0">없음</option><option value="7">영웅심리(7%)</option><option value="10">달리기가빠른(10%)</option></select></div>
-                <div><label>라이딩 장비(편자)</label><select id="ms_shoe" onchange="calc()"><option value="0">없음</option><option value="15">B(15%)</option><option value="30">A(30%)</option><option value="45">S(45%)</option></select></div>
-            </div>
-            <div class="row">
-                <div><label>질풍신 개별이속(%)</label><input type="number" id="ms_wind_only" placeholder="0" oninput="calc()"></div>
-                <div><label>장비 이속 총합(%)</label><input type="number" id="ms_eq_sum" placeholder="0" oninput="calc()"></div>
-            </div>
-            <div class="row">
-                <div><label>코스튬(40%)</label><select id="ms_cos" onchange="calc()"><option value="0">OFF</option><option value="40">ON</option></select></div>
-                <div><label>날개(20%)</label><select id="ms_wing" onchange="calc()"><option value="0">OFF</option><option value="20">ON</option></select></div>
-            </div>
-            <div class="row">
-                <div><label>인장(20%)</label><select id="ms_seal" onchange="calc()"><option value="0">OFF</option><option value="20">ON</option></select></div>
-                <div><label>라이딩(30%)</label><select id="ms_ride" onchange="calc()"><option value="0">OFF</option><option value="30">ON</option></select></div>
-            </div>
-            <div class="row">
-                <div><label>글레이셜보우(80%)</label><select id="ms_bow" onchange="calc()"><option value="0">OFF</option><option value="80">ON</option></select></div>
-                <div><label>대악마무기(200%)</label><select id="ms_devil" onchange="calc()"><option value="0">OFF</option><option value="200">ON</option></select></div>
-            </div>
-            <div class="row">
-                <div><label>비법 이속(15%)</label><input type="text" value="15%" disabled style="text-align:center;"></div>
-                <div><label>착용 질풍신 %(3~10)</label><input type="number" id="ms_wind_rate" placeholder="10" oninput="calc()"></div>
+
+            <div id="wind-input-area" style="display:none; background: #111; padding: 10px; border-radius: 5px;">
+                <label style="color:var(--unique);">🍃 질풍신 이속 상세 입력</label>
+                <div class="row">
+                    <div><label>헌터등급이속</label><select id="ms_hunter" onchange="calc()"><option value="0">일반(0%)</option><option value="10">히로익(10%)</option><option value="20">레전(20%)</option><option value="30">울티(30%)</option></select></div>
+                    <div><label>건물이속(0~50)</label><input type="number" id="ms_build" placeholder="50" oninput="calc()"></div>
+                </div>
+                <div class="row">
+                    <div><label>코스튬(40%)</label><select id="ms_cos" onchange="calc()"><option value="0">OFF</option><option value="40">ON</option></select></div>
+                    <div><label>날개(20%)</label><select id="ms_wing" onchange="calc()"><option value="0">OFF</option><option value="20">ON</option></select></div>
+                </div>
+                <div class="row">
+                    <div><label>인장(20%)</label><select id="ms_seal" onchange="calc()"><option value="0">OFF</option><option value="20">ON</option></select></div>
+                    <div><label>라이딩(30%)</label><select id="ms_ride" onchange="calc()"><option value="0">OFF</option><option value="30">ON</option></select></div>
+                </div>
+                <div class="row">
+                    <div><label>질풍신자체/장비합</label><input type="number" id="ms_etc_sum" placeholder="0" oninput="calc()"></div>
+                    <div><label>편자(B15/A30/S45)</label><select id="ms_shoe" onchange="calc()"><option value="0">0%</option><option value="15">15%</option><option value="30">30%</option><option value="45">45%</option></select></div>
+                </div>
+                <div class="row">
+                    <div><label>성격(영웅7/달리기10)</label><select id="ms_per" onchange="calc()"><option value="0">0%</option><option value="7">7%</option><option value="10">10%</option></select></div>
+                    <div><label>비법(15%고정)</label><input type="text" value="15%" disabled style="text-align:center;"></div>
+                </div>
+                <div class="row">
+                    <div><label>글레이셜(80%)</label><select id="ms_bow" onchange="calc()"><option value="0">OFF</option><option value="80">ON</option></select></div>
+                    <div><label>대악마(200%)</label><select id="ms_devil" onchange="calc()"><option value="0">OFF</option><option value="200">ON</option></select></div>
+                </div>
+                <div class="row">
+                    <div style="grid-column: span 2;"><label>착용 질풍신 옵션 %(3~10)</label><input type="number" id="ms_wind_rate" placeholder="10" oninput="calc()"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -92,32 +97,49 @@
         </div>
     </div>
 
-    <div class="section-title">📦 현재 장비 + 룬 상세</div>
-    <div class="card" style="border-left: 4px solid #555;">
+    <div class="section-title">공격력 증가 항목 (B, C, D, E)</div>
+    <div class="card">
         <div class="row">
-            <div><label>전공 장비(%)</label><input type="number" id="cur_atk_eq" placeholder="0" oninput="calc()"></div>
-            <div><label>전공 룬(%)</label><input type="number" id="cur_atk_rune" placeholder="24" oninput="calc()"></div>
+            <div><label>성격/연합/비법 등 합(%)</label><input type="number" id="b_etc" placeholder="60" oninput="calc()"></div>
+            <div><label>C: 건물+펫 합(%)</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
         </div>
-        <div class="row">
-            <div><label>치피 장비(%)</label><input type="number" id="cur_cp_eq" placeholder="0" oninput="calc()"></div>
-            <div><label>치피 룬(%)</label><input type="number" id="cur_cp_rune" placeholder="28" oninput="calc()"></div>
-        </div>
-        <div class="row">
-            <div><label>종족 장비(%)</label><input type="number" id="cur_sp_eq" placeholder="0" oninput="calc()"></div>
-            <div><label>종족 룬(%)</label><input type="number" id="cur_sp_rune" placeholder="28" oninput="calc()"></div>
-        </div>
-        <div class="row">
-            <div style="grid-column: span 2;"><label>증폭(%) - 유니크 합산 자동 기입</label>
-                <input type="number" id="cur_amp" placeholder="0" oninput="calc()" style="border: 1px solid var(--unique);">
-            </div>
-        </div>
-        <div class="row" style="margin-top:5px; font-size:0.75rem; color:#aaa;">
-            <div id="cur_cp_info">유니크 치피: +0%</div>
-            <div id="cur_ms_info">이속 총합: 0%</div>
+        <div class="row-3">
+            <div><label>코스튬/도감(%)</label><input type="number" id="d_dogam" placeholder="0" oninput="calc()"></div>
+            <div><label>인장/탈것(%)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>E: 요정(%)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
-    <div class="section-title">✨ 시뮬레이션 & 비교 분석</div>
+    <div class="section-title">치명타 피해량 (기본 175)</div>
+    <div class="card">
+        <div class="row">
+            <div><label>C: 건물+펫(기본81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()"></div>
+            <div><label>기타 도감/탈것(곱%)</label><input type="number" id="cp_mult" placeholder="0" oninput="calc()"></div>
+        </div>
+    </div>
+
+    <div class="section-title">종족 피해량 (기본 100)</div>
+    <div class="card">
+        <div class="row">
+            <div><label>A: 승전 버프(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()"></div>
+            <div><label>D: 도감/탈것(곱%)</label><input type="number" id="sp_mult" placeholder="0" oninput="calc()"></div>
+        </div>
+    </div>
+
+    <div class="section-title">📦 현재 장비 + 룬 상세</div>
+    <div class="card">
+        <div class="row">
+            <div><label>전공 장비/룬(%)</label><input type="number" id="cur_atk_eq" placeholder="24" oninput="calc()"></div>
+            <div><label>치피 장비/룬(%)</label><input type="number" id="cur_cp_eq" placeholder="28" oninput="calc()"></div>
+        </div>
+        <div class="row">
+            <div><label>종족 장비/룬(%)</label><input type="number" id="cur_sp_eq" placeholder="28" oninput="calc()"></div>
+            <div><label>증폭(%)</label><input type="number" id="cur_amp" placeholder="0" oninput="calc()"></div>
+        </div>
+        <div id="u-info-display" style="font-size:0.7rem; color:var(--unique); text-align:right;">유니크 미적용 상태</div>
+    </div>
+
+    <div class="section-title">✨ 시뮬레이션</div>
     <div class="card" style="border: 1px solid var(--accent);">
         <div class="row">
             <div><label>추가 전공</label><input type="number" id="n_atk" placeholder="0" oninput="calc()"></div>
@@ -127,28 +149,11 @@
             <div><label>추가 증폭</label><input type="number" id="n_amp" placeholder="0" oninput="calc()"></div>
             <div><label>추가 종족</label><input type="number" id="n_sp" placeholder="0" oninput="calc()"></div>
         </div>
-        <button class="btn sim-btn" id="swap-btn" onclick="applySwapSimulation()">🔄 유니크 스왑 시뮬레이션 적용</button>
-        <div id="swap-info" style="font-size:0.75rem; color:var(--unique); margin-top:5px; text-align:center;">
-            현재 착용 장비 기준 비교 가능
-        </div>
+        <button class="btn" style="background:#2c3e50; border:1px solid var(--unique); color:var(--unique);" onclick="autoSwapSim()">🔄 유니크 스왑 시뮬레이션 버튼</button>
     </div>
-
-    <button class="btn" onclick="toggleElement('etc-card')">⚙️ 기타 세부 스텟 (건물, 펫 등)</button>
-    <div id="etc-card" class="card" style="display:none;">
-        <div class="row">
-            <div><label>C: 건물+펫(공)</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
-            <div><label>C: 건물+펫(치피)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()"></div>
-        </div>
-        <div class="row">
-            <div><label>도감(치피 곱%)</label><input type="number" id="cp_mult_dogam" placeholder="0" oninput="calc()"></div>
-            <div><label>도감(종족 %)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()"></div>
-        </div>
-        </div>
 
     <button class="btn" onclick="toggleElement('log-box')">📊 상세 계산 로그 보기</button>
     <div id="log-box" class="log-container"></div>
-
-    <div class="footer">Made by 과자꽃 to Flower연합 | v6.0 Unique Edition</div>
 </div>
 
 <script>
@@ -157,42 +162,30 @@
         box.style.display = (box.style.display === 'block') ? 'none' : 'block';
     }
 
-    // 유니크 토글 로직
+    // 유니크 버튼 토글
     function toggleUnique(btn) {
         const type = btn.getAttribute('data-type');
-        const btns = document.querySelectorAll('.u-btn');
+        const isAlreadyActive = btn.classList.contains('active');
         const activeBtns = document.querySelectorAll('.u-btn.active');
 
-        if (btn.classList.contains('active')) {
+        if (isAlreadyActive) {
             btn.classList.remove('active');
         } else {
-            // 중복 방지 (같은 타입은 하나만)
-            btns.forEach(b => { if(b.getAttribute('data-type') === type) b.classList.remove('active'); });
-            // 최대 2개 제한
+            // 동일 타입 중복 방지 (블피/진블피 등)
+            document.querySelectorAll(`.u-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
+            // 최대 2개 체크
             if (document.querySelectorAll('.u-btn.active').length >= 2) {
                 alert("유니크 장비는 최대 2개까지만 선택 가능합니다.");
                 return;
             }
             btn.classList.add('active');
         }
-        updateUniqueUI();
-        calc();
-    }
-
-    function updateUniqueUI() {
-        const activeTypes = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
-        const isWind = activeTypes.some(t => t.includes("질풍신"));
-        document.getElementById('wind-settings').style.display = isWind ? 'block' : 'none';
         
-        // 스왑 버튼 텍스트 업데이트
-        const swapBtn = document.getElementById('swap-btn');
-        if (activeTypes.some(t => t.includes("블피"))) {
-            swapBtn.innerText = "🔄 블피 → 질풍신 스왑 시뮬레이션";
-        } else if (isWind) {
-            swapBtn.innerText = "🔄 질풍신 → 진블피 스왑 시뮬레이션";
-        } else {
-            swapBtn.innerText = "🔄 유니크 스왑 시뮬레이션";
-        }
+        // 질풍신 입력창 제어
+        const hasWind = Array.from(document.querySelectorAll('.u-btn.active')).some(b => b.innerText.includes("질풍신"));
+        document.getElementById('wind-input-area').style.display = hasWind ? 'block' : 'none';
+        
+        calc();
     }
 
     function calc() {
@@ -204,120 +197,96 @@
         const mode = document.getElementById('calc_mode').value;
         const carve = document.getElementById('a_carve').checked ? 107 : 100;
 
-        // 1. 유니크 능력치 산출
-        const activeBtns = document.querySelectorAll('.u-btn.active');
+        // 1. 유니크 스탯 선계산
         let u_cp = 0;
         let u_amp = 0;
         let ms_total = 0;
-
-        activeBtns.forEach(btn => {
+        const activeUnique = document.querySelectorAll('.u-btn.active');
+        
+        activeUnique.forEach(btn => {
             const type = btn.getAttribute('data-type');
             const val = parseFloat(btn.getAttribute('data-val'));
-            if (type === 'blood') u_cp = val;
-            if (type === 'neck') u_amp += 20;
-            if (type === 'wind') {
-                // 이속 계산
-                ms_total = g('ms_hunter') + g('ms_build') + g('ms_per') + g('ms_shoe') + 
-                           g('ms_wind_only') + g('ms_eq_sum') + g('ms_cos') + g('ms_wing') + 
-                           g('ms_seal') + g('ms_ride') + g('ms_bow') + g('ms_devil') + 15;
+            if(type === 'blood') u_cp = val;
+            if(type === 'neck') u_amp += 20;
+            if(type === 'wind') {
+                ms_total = g('ms_hunter') + g('ms_build') + g('ms_per') + g('ms_shoe') + g('ms_cos') + 
+                           g('ms_wing') + g('ms_seal') + g('ms_ride') + g('ms_bow') + g('ms_devil') + 
+                           g('ms_etc_sum') + 15;
                 let wind_amp = ms_total * (g('ms_wind_rate') / 100);
-                u_amp += Math.min(wind_amp, val); // 상한 30% or 40%
+                u_amp += Math.min(wind_amp, val);
             }
         });
 
-        // 현재 장비 칸에 자동 동기화
-        document.getElementById('cur_amp').value = u_amp;
-        document.getElementById('cur_cp_info').innerText = `유니크 치피: +${u_cp}%`;
-        document.getElementById('cur_ms_info').innerText = `이속 총합: ${ms_total}%`;
+        // 현재 장비 칸 자동 기입 (유니크 기능 사용 시)
+        if(activeUnique.length > 0) {
+            document.getElementById('cur_amp').value = u_amp;
+            document.getElementById('u-info-display').innerText = `유니크 적용: 치피+${u_cp}%, 증폭+${u_amp.toFixed(1)}% (이속:${ms_total}%)`;
+        } else {
+            document.getElementById('u-info-display').innerText = `유니크 미적용 상태`;
+        }
 
-        const getStats = (addAtk=0, addCp=0, addAmp=0, addSp=0, isNext=false) => {
-            // 공격력
+        const getResult = (addAtk, addCp, addAmp, addSp, isCurrent) => {
+            // 공격력 계산
             const multA = (100 + g('a_win') + g('a_dungeon')) / 100;
-            const b_sum = 15 + 30 + 8 + 15; // 성격(기본값)+연합+보라등급+비법
-            const cur_atk_sum = g('cur_atk_eq') + g('cur_atk_rune');
-            const multBC = (100 + b_sum + g('c_val') + cur_atk_sum + addAtk) / 100;
-            const multD = (100 + g('d_mu') + g('d_dogam') + g('d_in') + g('d_ride')) / 100;
+            const multBC = (100 + g('b_etc') + g('c_val') + g('cur_atk_eq') + addAtk) / 100;
+            const multD = (100 + g('d_dogam') + g('d_ride')) / 100;
             const multE = (100 + g('e_fairy')) / 100;
             const totalAtk = (mode === 'village') ? carve * multA * multBC * multD * multE : carve * multBC * multD * multE;
 
-            // 치피 (유니크 치피 u_cp 포함)
-            const cpBaseSum = 175 + g('cp_base') + (isNext ? 0 : u_cp) + g('cur_cp_eq') + g('cur_cp_rune') + addCp;
-            const cpMult = (100 + g('cp_mult_dogam')) / 100;
-            const totalCp = (cpBaseSum * cpMult) / 100;
+            // 치피 계산 (현재 데이터에는 유니크 u_cp가 이미 포함된 것으로 가정하거나 시뮬에서 처리)
+            const baseCp = 175 + g('cp_base') + g('cur_cp_eq') + (isCurrent ? u_cp : 0) + addCp;
+            const totalCp = (baseCp * (100 + g('cp_mult')) / 100) / 100;
 
-            // 종족
-            const spBaseSum = 100 + g('cur_sp_eq') + g('cur_sp_rune') + addSp;
-            const spMultD = (100 + g('sp_dogam')) / 100;
-            const totalSp = (spBaseSum * spMultD * (100 + g('sp_win')) / 100) / 100;
+            // 종족 계산 (100 * 1.n * 1.n 구조)
+            const spBase = (100 + g('cur_sp_eq') + addSp) / 100;
+            const spMult = (100 + g('sp_mult')) / 100;
+            const totalSp = (100 * spBase * spMult * (100 + g('sp_win')) / 100) / 100;
 
-            // 증폭
-            const totalAmp = (100 + (isNext ? g('cur_amp') : u_amp) + addAmp) / 100;
+            // 증폭 계산
+            const totalAmp = (100 + g('cur_amp') + addAmp) / 100;
 
-            const final = totalAtk * totalCp * totalSp * totalAmp;
-            return { totalAtk, totalCp, totalSp, totalAmp, final, cpBaseSum, ms_total, u_amp };
+            return { final: totalAtk * totalCp * totalSp * totalAmp, totalAtk, totalCp, totalSp, totalAmp };
         };
 
-        const cur = getStats(0, 0, 0, 0, false);
-        const next = getStats(g('n_atk'), g('n_cp'), g('n_amp'), g('n_sp'), true);
+        const cur = getResult(0, 0, 0, 0, true);
+        const next = getResult(g('n_atk'), g('n_cp'), g('n_amp'), g('n_sp'), false);
 
         document.getElementById('cur_d').innerText = Math.floor(cur.final).toLocaleString();
         document.getElementById('next_d').innerText = Math.floor(next.final).toLocaleString();
-        
         const diff = ((next.final / cur.final) - 1) * 100;
         const out = document.getElementById('eff_out');
         out.innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
         out.style.color = diff >= 0 ? '#00e676' : '#ff5252';
 
-        // 로그 생성
         document.getElementById('log-box').innerHTML = 
-            `<b>[현재]</b> 공 ${cur.totalAtk.toFixed(1)} * 치 ${cur.totalCp.toFixed(2)} * 종 ${cur.totalSp.toFixed(2)} * 증 ${cur.totalAmp.toFixed(2)} = ${Math.floor(cur.final).toLocaleString()}<br>` +
-            `<b>[비교]</b> 공 ${next.totalAtk.toFixed(1)} * 치 ${next.totalCp.toFixed(2)} * 종 ${next.totalSp.toFixed(2)} * 증 ${next.totalAmp.toFixed(2)} = ${Math.floor(next.final).toLocaleString()}<br>` +
-            `<span style="color:var(--unique)">* 현재 증폭 ${cur.u_amp.toFixed(1)}% (이속계산 결과)</span>`;
+            `<b>[현재]</b> 공:${cur.totalAtk.toFixed(1)} * 치:${cur.totalCp.toFixed(2)}배 * 종:${cur.totalSp.toFixed(2)}배 * 증:${cur.totalAmp.toFixed(2)}배<br>` +
+            `<b>[비교]</b> 공:${next.totalAtk.toFixed(1)} * 치:${next.totalCp.toFixed(2)}배 * 종:${next.totalSp.toFixed(2)}배 * 증:${next.totalAmp.toFixed(2)}배`;
     }
 
-    // 유니크 스왑 시뮬레이션 로직
-    function applySwapSimulation() {
-        const activeBtns = Array.from(document.querySelectorAll('.u-btn.active'));
-        const activeNames = activeBtns.map(b => b.innerText);
+    // 시뮬레이션 자동 완성
+    function autoSwapSim() {
+        const activeBtns = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
+        if(activeBtns.length === 0) { alert("상단 유니크 장비를 먼저 선택해주세요!"); return; }
+
+        let n_cp = 0; let n_amp = 0;
         
-        let addCp = 0;
-        let addAmp = 0;
-
-        // 1. 블피계열 -> 질풍신 스왑 시
-        if (activeNames.some(t => t.includes("블피"))) {
-            const isJin = activeNames.some(t => t.includes("진 블피"));
-            addCp = isJin ? -300 : -250;
-            
-            // 질풍신 가상 증폭 계산 (현재 이속 설정값 기준)
-            const ms = 10 + 50 + 7 + 30 + 15 + 40 + 20 + 20 + 30 + 15; // 임시 기본합
-            const ms_calc = (ms * 0.1); // 10% 기준
-            addAmp = Math.min(ms_calc, 40); 
-            
-            document.getElementById('n_cp').value = addCp;
-            document.getElementById('n_amp').value = addAmp;
-            alert(`시뮬레이션 적용: 블피 제거(치피 ${addCp}%) 및 질풍신 장착(증폭 +${addAmp.toFixed(1)}% 추정)`);
-        } 
-        // 2. 질풍신계열 -> 진블피 스왑 시
-        else if (activeNames.some(t => t.includes("질풍신"))) {
-            const curAmp = parseFloat(document.getElementById('cur_amp').value);
-            const hasNeck = activeNames.some(t => t.includes("용의 목걸이"));
-            
-            addAmp = -(curAmp - (hasNeck ? 20 : 0)); // 용목 제외 질풍신 증폭만 제거
-            addCp = 300; // 진블피 장착 가정
-            
-            document.getElementById('n_cp').value = addCp;
-            document.getElementById('n_amp').value = addAmp;
-            alert(`시뮬레이션 적용: 질풍신 제거(증폭 ${addAmp.toFixed(1)}%) 및 진블피 장착(치피 +300%)`);
-        } else {
-            alert("먼저 유니크 장비를 선택해주세요.");
+        if(activeBtns.some(t => t.includes("블피"))) {
+            const isJin = activeBtns.some(t => t.includes("진 블피"));
+            n_cp = isJin ? -300 : -250;
+            n_amp = 30; // 질풍신 스왑 가정 시 30% 증가로 세팅
+            alert("시뮬레이션: 현재 블피 제거(치피 " + n_cp + ") 및 질풍신 장착(증폭 +30) 가정");
+        } else if(activeBtns.some(t => t.includes("질풍신"))) {
+            n_cp = 300; // 진블피 장착 가정
+            n_amp = -(parseFloat(document.getElementById('cur_amp').value)); // 현재 질풍 증폭 제거
+            alert("시뮬레이션: 현재 질풍신 제거(증폭 " + n_amp + ") 및 진블피 장착(치피 +300) 가정");
         }
+        
+        document.getElementById('n_cp').value = n_cp;
+        document.getElementById('n_amp').value = n_amp;
         calc();
     }
 
-    window.onload = () => {
-        updateUniqueUI();
-        calc();
-    };
+    window.onload = calc;
 </script>
 </body>
 </html>
