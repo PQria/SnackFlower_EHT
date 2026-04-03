@@ -44,13 +44,15 @@
     <button class="btn" onclick="toggleElement('help-box')" style="background: #222; border: 1px solid #444; margin-bottom: 5px;">📖 사용 설명서 (클릭하여 열기/닫기)</button>
     <div id="help-box" class="help-box">
         <div id="help-content">
-            1. <b>종족</b>: 목표 종족에 대한 수치를 직접 입력하세요.<br>
-            2. <b>공격력/치피</b>: 각 항목에 맞는 수치를 입력하면 배율로 환산됩니다.<br>
-            3. <b>로직</b>: 종족 피해량은 (기본 100) × (장비룬 배율) × (탈것도감 배율)로 계산됩니다.
+            1. <b>종족</b>: 본인이 목표하는 종족에 대한 값을 본인이 생각해서 작성해야합니다.<br>
+            2. <b>능력치 작성</b>: 모든 칸에 대하여 헌터 및 각종 능력치에 관한 상세 정보를 작성합니다.<br>
+            3. <b>건물+펫</b>: 건물 능력치 + 마을 펫의 합산입니다.<br>
+            4. <b>현재 장비</b>: 증폭은 질풍신, 용목, 탈것 장비 등 증폭효과에 대한 합산을 작성.<br>
+            5. <b>시뮬레이션</b>: 추가할 옵션은 숫자로 기입, 빠질 옵션은 -숫자로 기입하세요.<br>
         </div>
     </div>
 
-    <div class="section-title">공격력 기초 (A)</div>
+    <div class="section-title">공격력 기초</div>
     <div class="card">
         <div style="margin-bottom:10px;">
             <label><input type="checkbox" id="a_carve" onchange="calc()"> 무기 각인 활성화 (기본공 100→107)</label>
@@ -88,7 +90,7 @@
         </div>
         <div class="row">
             <div><label>비법+이외</label><input type="number" id="b_etc" placeholder="15" oninput="calc()"></div>
-            <div><label>C: 건물+펫</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
+            <div><label>건물+펫</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
         </div>
         <hr><label style="text-align:center; margin-bottom:5px;">[전공 세부 능력치]</label>
         <div class="row-3">
@@ -97,8 +99,8 @@
             <div><label>인장(%)</label><input type="number" id="d_in" placeholder="0" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>D: 탈것+탈것장비(공 %)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
-            <div><label>E: 요정(공 %)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
+            <div><label>탈것+탈것장비(공 %)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>요정(공 %)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
@@ -110,8 +112,8 @@
         </div>
         <hr><label style="text-align:center; margin-bottom:5px;">[치피 탈것 및 도감]</label>
         <div class="row">
-            <div><label>도감(곱 %)</label><input type="number" id="cp_mult_dogam" placeholder="0" oninput="calc()"></div>
-            <div><label>탈것+탈것장비(곱 %)</label><input type="number" id="cp_mult_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>도감(%)</label><input type="number" id="cp_mult_dogam" placeholder="0" oninput="calc()"></div>
+            <div><label>탈것+탈것장비(%)</label><input type="number" id="cp_mult_ride" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
@@ -119,7 +121,7 @@
     <div class="card">
         <div class="row">
             <div><label>A: 승전 버프(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()"></div>
-            <div><label>D: 이외(곱연산 %)</label><input type="number" id="sp_d" placeholder="0" oninput="calc()"></div>
+            <div><label>D: 이외(%)</label><input type="number" id="sp_d" placeholder="0" oninput="calc()"></div>
         </div>
         <hr><label style="text-align:center; margin-bottom:5px;">[종족 탈것 및 도감 - 곱연산 계열]</label>
         <div class="row">
