@@ -392,7 +392,31 @@
     }
 
     window.onload = () => { changeMode(); calc(); };
+    
+<hr style="border:0; border-top:1px dashed #444; margin:10px 0;">
 
+<b>[4. 가치 분석 (현재 스탯 대비 1%당 효율)]</b>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px;">
+    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #ff5252;">
+        <span style="color:#aaa; font-size:0.7rem;">공격력 1% 증가 시</span><br>
+        <span style="color:#fff;">+${(100 / (mode === 'village' ? (cur.B + cur.C) * 100 : cur.B * 100) * 100).toFixed(3)}%</span>
+    </div>
+    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #00e676;">
+        <span style="color:#aaa; font-size:0.7rem;">치명피해 1% 증가 시</span><br>
+        <span style="color:#fff;">+${(100 / cur.cpTotal * 100).toFixed(3)}%</span>
+    </div>
+    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #unique;">
+        <span style="color:#aaa; font-size:0.7rem;">증폭 1% 증가 시</span><br>
+        <span style="color:#fff;">+${(100 / (100 + cur.ampSum) * 100).toFixed(3)}%</span>
+    </div>
+    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #3498db;">
+        <span style="color:#aaa; font-size:0.7rem;">종족피해 1% 증가 시</span><br>
+        <span style="color:#fff;">+${(100 / cur.spBase * 100).toFixed(3)}%</span>
+    </div>
+</div>
+<div style="margin-top:8px; font-size:0.7rem; color:#888;">
+    * 위 수치가 높을수록 해당 옵션을 올렸을 때의 실질 데미지 상승 폭이 큽니다.
+</div>
     
 </script>
 </body>
