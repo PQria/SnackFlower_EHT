@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이헌타 정밀 계산기 v7.6</title>
+    <title>이헌타 정밀 계산기 v7.7</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; --unique: #ff9800; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
@@ -21,7 +21,6 @@
         .eff { font-size: 1.4rem; color: var(--accent); font-weight: bold; margin-top: 5px; }
         .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.75rem; border: 1px solid #444; color: #00ff41; line-height: 1.6; white-space: pre-wrap; }
         .btn { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
-        /* 가이드 스타일 추가 */
         .guide-box { background: #2c3e50; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--unique); font-size: 0.8rem; line-height: 1.5; }
     </style>
 </head>
@@ -46,8 +45,8 @@
         <strong>📌 사용법 및 특이사항</strong><br>
         1. <b>유니크 설정</b>: 현재 착용 중인 유니크를 먼저 선택하세요. (최대 2개)<br>
         2. <b>모드 전환</b>: 마을(합연산)과 콜로(곱연산)의 공식을 실시간 적용합니다.<br>
-        3. <b>스왑 시뮬</b>: 블피↔질풍신 전환 효율을 계산합니다. (두 종류 동시 착용 시 비활성)<br>
-        4. <b>상세 로직</b>: 하단 버튼을 통해 각 항목별 계산 과정을 확인할 수 있습니다.
+        3. <b>증폭 설정</b>: 유니크 외 고삐 및 기타 증폭 수치를 입력하세요.<br>
+        4. <b>상세 로직</b>: 하단 버튼을 통해 계산 로그를 상세히 확인할 수 있습니다.
     </div>
 
     <button class="btn" style="border: 1px solid var(--unique); color: var(--unique); background:#222;" onclick="toggleElement('unique-section')">💎 현재 착용 유니크 설정</button>
@@ -139,6 +138,14 @@
         </div>
     </div>
 
+    <div class="section-title">🛡️ 증폭 설정 (합연산)</div>
+    <div class="card">
+        <div class="row">
+            <div><label>강철돌격대 고삐</label><select id="amp_bridle" onchange="calc()"><option value="0">OFF (0%)</option><option value="10">ON (10%)</option></select></div>
+            <div><label>기타 증폭 설정</label><input type="number" id="amp_etc" placeholder="0" oninput="calc()"></div>
+        </div>
+    </div>
+
     <div class="section-title">📦 현재 장비 + 룬 상세</div>
     <div class="card">
         <div class="row">
@@ -154,7 +161,7 @@
             <div><label>종족 룬</label><input type="number" id="cur_sp_rune" placeholder="28" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div style="grid-column: span 2;"><label>현재 증폭%</label><input type="number" id="cur_amp" value="0" readonly style="border:1px solid var(--unique); color:var(--unique);"></div>
+            <div style="grid-column: span 2;"><label>현재 총 증폭% (유니크 포함)</label><input type="number" id="cur_amp" value="0" readonly style="border:1px solid var(--unique); color:var(--unique);"></div>
         </div>
     </div>
 
@@ -247,7 +254,6 @@
         const content = document.getElementById('swap-tool-content');
         const activeTypes = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.getAttribute('data-type'));
         
-        // 블피와 질풍신 둘 다 착용 중이면 스왑 불가
         if(activeTypes.includes('blood') && activeTypes.includes('wind')) {
             alert("블피류와 질풍신류를 동시에 착용 중일 때는 스왑 기능을 사용할 수 없습니다.");
             box.style.display = 'none';
@@ -290,9 +296,14 @@
             document.getElementById('n_cp').value = bloodMinus;
             document.getElementById('n_amp').value = amp.toFixed(1);
         } else {
-            const curAmp = parseFloat(document.getElementById('cur_amp').value);
-            const neckAmp = activeBtns.some(b => b.getAttribute('data-type') === 'neck') ? 20 : 0;
-            document.getElementById('n_amp').value = -(curAmp - neckAmp);
+            const curAmpOnlyUnique = 0; // 유니크로 인한 증폭만 계산해야함
+            document.querySelectorAll('.u-btn.active').forEach(btn => {
+                if(btn.getAttribute('data-type') === 'wind') {
+                    const ms = v('ms_hunter') + v('ms_personality') + v('ms_build') + v('ms_shoe') + v('ms_cos') + v('ms_wing') + v('ms_seal') + v('ms_ride') + v('ms_frozen') + v('ms_devil') + v('ms_eq') + v('ms_rune') + 15;
+                    const windVal = Math.min(ms * (v('ms_wind_rate') || 10) / 100, parseFloat(btn.getAttribute('data-val')));
+                    document.getElementById('n_amp').value = -windVal.toFixed(1);
+                }
+            });
             document.getElementById('n_cp').value = simBloodVal;
         }
         calc();
@@ -307,6 +318,8 @@
         const mode = document.getElementById('calc_mode').value;
         const carveVal = document.getElementById('a_carve').checked ? 1.07 : 1.00;
 
+        // 증폭 합계 계산 (유니크 + 고삐 + 기타)
+        let base_amp = v('amp_bridle') + v('amp_etc');
         let cur_u_amp = 0;
         document.querySelectorAll('.u-btn.active').forEach(btn => {
             if(btn.getAttribute('data-type') === 'neck') cur_u_amp += 20;
@@ -315,7 +328,8 @@
                 cur_u_amp += Math.min(ms * (v('ms_wind_rate') || 10) / 100, parseFloat(btn.getAttribute('data-val')));
             }
         });
-        document.getElementById('cur_amp').value = cur_u_amp.toFixed(1);
+        const total_cur_amp = base_amp + cur_u_amp;
+        document.getElementById('cur_amp').value = total_cur_amp.toFixed(1);
 
         const run = (isNext) => {
             const A = (100 + v('a_win') + v('a_dungeon')) / 100;
@@ -334,10 +348,10 @@
             const spMul = ((100 + v('sp_dogam')) / 100) * ((100 + v('sp_ride')) / 100);
             const finalSp = (spBase * spMul) / 100;
 
-            const ampVal = isNext ? (cur_u_amp + v('n_amp')) : cur_u_amp;
-            const finalAmp = (100 + ampVal) / 100;
+            const ampSum = total_cur_amp + (isNext ? v('n_amp') : 0);
+            const finalAmp = (100 + ampSum) / 100;
 
-            return { final: atk * finalCp * finalSp * finalAmp, atk, cp: finalCp, sp: finalSp, amp: finalAmp, A, B, C, D, E, cpTotal, cpMul, spBase, spMul, ampVal };
+            return { final: atk * finalCp * finalSp * finalAmp, atk, cp: finalCp, sp: finalSp, amp: finalAmp, A, B, C, D, E, cpTotal, cpMul, spBase, spMul, ampSum };
         };
 
         const cur = run(false);
@@ -350,7 +364,7 @@
         document.getElementById('eff_out').innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
         document.getElementById('eff_out').style.color = (Math.abs(diff) < 0.001) ? '#00e676' : (diff > 0 ? '#00e676' : '#ff5252');
 
-        // 로직 상세 확인 업데이트
+        // 상세 로직 확인 업데이트 (수정됨)
         document.getElementById('log-box').innerHTML = `
 <b>[1. 공격력 상세 로직]</b>
 공식: ${mode === 'village' ? '각인 * A * (B+C-1) * D * E' : 'B * D * E'}
@@ -359,14 +373,15 @@
 • C: (100 + ${v('c_build')} + ${v('c_shingang')} + ${v('cur_atk_eq')} + ${v('cur_atk_rune')})% = ${cur.C.toFixed(3)}
 • D: (100 + ${v('d_cos')} + ${v('d_dogam')} + ${v('d_seal')} + ${v('d_etc')})% = ${cur.D.toFixed(3)}
 • E: (100 + ${v('e_fairy')})% = ${cur.E.toFixed(2)}
-▶ 최종 공격력 계수: ${cur.atk.toFixed(5)} ${isNext ? '→ (비교) ' + next.atk.toFixed(5) : ''}
+▶ 최종 공격력 계수: ${cur.atk.toFixed(5)} ${v('n_atk') !== 0 ? '→ (비교) ' + next.atk.toFixed(5) : ''}
 
 <b>[2. 배율 상세 로직]</b>
 • 치피: [기본175 + 합${(v('cp_base')+v('cur_cp_eq')+v('cur_cp_rune'))}] * 도감(${((100+v('cp_dogam'))/100).toFixed(2)}) * 탈것(${((100+v('cp_ride'))/100).toFixed(2)})
-  = ${cur.cp.toFixed(3)}배 ${isNext ? '→ (비교) ' + next.cp.toFixed(3) + '배' : ''}
+  = ${cur.cp.toFixed(3)}배 ${v('n_cp') !== 0 ? '→ (비교) ' + next.cp.toFixed(3) + '배' : ''}
 • 종족: [기본100 + 합${(v('sp_win')+v('cur_sp_eq')+v('cur_sp_rune'))}] * 도감(${((100+v('sp_dogam'))/100).toFixed(2)}) * 탈것(${((100+v('sp_ride'))/100).toFixed(2)})
-  = ${cur.sp.toFixed(3)}배 ${isNext ? '→ (비교) ' + next.sp.toFixed(3) + '배' : ''}
-• 증폭: (100 + ${cur.ampVal.toFixed(1)})% = ${cur.amp.toFixed(3)}배 ${isNext ? '→ (비교) ' + next.amp.toFixed(3) + '배' : ''}
+  = ${cur.sp.toFixed(3)}배 ${v('n_sp') !== 0 ? '→ (비교) ' + next.sp.toFixed(3) + '배' : ''}
+• 증폭: (100 + 유니크(${cur_u_amp.toFixed(1)}) + 고삐(${v('amp_bridle')}) + 기타(${v('amp_etc')}))% = ${cur.amp.toFixed(3)}배
+  ${v('n_amp') !== 0 ? '→ (비교) ' + next.amp.toFixed(3) + '배' : ''}
 
 <b>[3. 최종 계산 결과]</b>
 • 현재: ${cur.atk.toFixed(4)} * ${cur.cp.toFixed(3)} * ${cur.sp.toFixed(3)} * ${cur.amp.toFixed(3)} = ${(cur.final*1000).toFixed(0)}
