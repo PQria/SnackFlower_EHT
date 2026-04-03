@@ -3,51 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>이헌타 정밀 계산기 v6.7</title>
+    <title>이헌타 정밀 계산기 v1.8</title>
     <style>
         :root { --bg: #1a1a1a; --card: #262626; --accent: #00e676; --text: #eee; --log-bg: #111; --unique: #ff9800; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
-        .header { position: sticky; top: 0; background: #333; padding: 15px; border-bottom: 2px solid var(--accent); z-index: 100; text-align: center; }
+        .header { position: sticky; top: 0; background: #333; padding: 10px; border-bottom: 2px solid var(--accent); z-index: 100; text-align: center; }
         .container { padding: 15px; max-width: 600px; margin: auto; }
         .section-title { font-weight: bold; color: var(--accent); margin: 15px 0 5px; font-size: 0.9rem; }
         .card { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         label { font-size: 0.7rem; color: #aaa; display: block; margin-bottom: 2px; }
-        input, select { width: 100%; background: #333; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
+        input, select, textarea { width: 100%; background: #333; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem; }
         .btn-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
         .u-btn, .s-btn { flex: 1; min-width: 60px; padding: 8px 4px; font-size: 0.7rem; background: #444; border: 1px solid #555; color: #fff; cursor: pointer; border-radius: 4px; }
         .u-btn.active, .s-btn.active { background: var(--unique); border-color: #fff; font-weight: bold; }
         .eff { font-size: 1.4rem; color: var(--accent); font-weight: bold; margin-top: 5px; }
-        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; border: 1px solid #444; color: #00ff41; line-height: 1.6; }
+        .log-container { display: none; background: var(--log-bg); padding: 15px; border-radius: 8px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 0.75rem; border: 1px solid #444; color: #00ff41; line-height: 1.5; overflow-x: auto; }
         .btn { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
         .u-toggle-btn { background: #222; border: 1px solid var(--unique); color: var(--unique); margin-bottom: 15px; }
-        .wind-log { color: #ffeb3b; font-size: 0.75rem; margin-top: 5px; padding: 8px; border: 1px dashed var(--unique); border-radius: 4px; }
+        .reset-btn { background: #c0392b !important; margin-top: 10px; }
+        hr { border: 0; border-top: 1px solid #444; margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px;">
         <select id="calc_mode" onchange="changeMode()" style="width: auto;">
             <option value="village">마을/보스 모드</option>
             <option value="colo">콜로세움 모드</option>
         </select>
-        <label style="color:white; display:flex; align-items:center; cursor:pointer;">
+        <label style="color:white; display:flex; align-items:center; cursor:pointer; font-size:0.8rem;">
             <input type="checkbox" id="a_carve" onchange="calc()" style="width:auto; margin-right:5px;"> 무기 각인(107)
         </label>
     </div>
-    <div style="display:flex; justify-content: space-around;">
-        <div>현재 데미지<br><span id="cur_d">0</span></div>
-        <div>비교 데미지<br><span id="next_d">0</span></div>
+    <div style="display:flex; justify-content: space-around; font-size: 0.8rem;">
+        <div>현재<br><span id="cur_d" style="font-weight:bold; color:var(--accent);">0</span></div>
+        <div>비교<br><span id="next_d" style="font-weight:bold; color:#fff;">0</span></div>
     </div>
     <div class="eff" id="eff_out">효율: +0.00%</div>
 </div>
 
 <div class="container">
-    <button class="btn u-toggle-btn" onclick="toggleElement('unique-section')">💎 유니크 비교 기능 설정</button>
+    <div class="section-title">📝 유의사항 및 메모</div>
+    <textarea id="user_memo" rows="3" placeholder="여기에 계산 시 유의사항을 적으세요..."></textarea>
+
+    <button class="btn u-toggle-btn" onclick="toggleElement('unique-section')">💎 현재 착용 유니크 설정</button>
     <div id="unique-section" style="display:none; margin-bottom: 20px;">
-        <div class="section-title" style="color:var(--unique);">현재 착용 유니크 (최대 2개)</div>
         <div class="card" style="border: 1px solid var(--unique);">
             <div class="btn-group">
                 <button class="u-btn" data-type="blood" data-val="250" onclick="toggleUnique(this)">블러드피스트</button>
@@ -57,64 +60,63 @@
                 <button class="u-btn" data-type="neck" data-val="20" onclick="toggleUnique(this)">용의 목걸이</button>
             </div>
             <div id="wind-input-area" style="display:none; background: #111; padding: 10px; border-radius: 5px; margin-top:10px;">
-                <label style="color:var(--unique); font-weight:bold;">🍃 현재 질풍신 이속 상세</label>
+                <label style="color:var(--unique);">🍃 현재 질풍신 이속 상세</label>
                 <div class="row">
-                    <div><label>헌터등급이속</label><select id="ms_hunter" onchange="calc()"><option value="0">일반(0%)</option><option value="10">히로익(10%)</option><option value="20">레전(20%)</option><option value="30">울티(30%)</option></select></div>
-                    <div><label>건물이속(0~50)</label><input type="number" id="ms_build" placeholder="50" oninput="calc()"></div>
+                    <div><label>헌터등급</label><select id="ms_hunter" onchange="calc()"><option value="0">일반</option><option value="10">히로익</option><option value="20">레전</option><option value="30" selected>울티</option></select></div>
+                    <div><label>건물이속</label><input type="number" id="ms_build" placeholder="50" oninput="calc()"></div>
                 </div>
                 <div class="row">
-                    <div><label>코스튬(40%)</label><select id="ms_cos" onchange="calc()"><option value="40" selected>ON</option><option value="0">OFF</option></select></div>
-                    <div><label>날개(20%)</label><select id="ms_wing" onchange="calc()"><option value="20" selected>ON</option><option value="0">OFF</option></select></div>
+                    <div><label>코스튬(40)</label><select id="ms_cos" onchange="calc()"><option value="40" selected>ON</option><option value="0">OFF</option></select></div>
+                    <div><label>날개(20)</label><select id="ms_wing" onchange="calc()"><option value="20" selected>ON</option><option value="0">OFF</option></select></div>
                 </div>
                 <div class="row">
-                    <div><label>인장(20%)</label><select id="ms_seal" onchange="calc()"><option value="20" selected>ON</option><option value="0">OFF</option></select></div>
-                    <div><label>라이딩(30%)</label><select id="ms_ride" onchange="calc()"><option value="30" selected>ON</option><option value="0">OFF</option></select></div>
+                    <div><label>인장(20)</label><select id="ms_seal" onchange="calc()"><option value="20" selected>ON</option><option value="0">OFF</option></select></div>
+                    <div><label>라이딩(30)</label><select id="ms_ride" onchange="calc()"><option value="30" selected>ON</option><option value="0">OFF</option></select></div>
                 </div>
                 <div class="row">
-                    <div><label>편자</label><select id="ms_shoe" onchange="calc()"><option value="0">0%</option><option value="15">B(15%)</option><option value="30">A(30%)</option><option value="45">S(45%)</option></select></div>
-                    <div><label>글레이셜(80%)</label><select id="ms_bow" onchange="calc()"><option value="0">OFF</option><option value="80">ON</option></select></div>
+                    <div><label>편자</label><select id="ms_shoe" onchange="calc()"><option value="45" selected>S(45)</option><option value="30">A(30)</option><option value="15">B(15)</option><option value="0">0</option></select></div>
+                    <div><label>글레이셜(80)</label><select id="ms_bow" onchange="calc()"><option value="0">OFF</option><option value="80">ON</option></select></div>
                 </div>
                 <div class="row">
-                    <div><label>대악마(200%)</label><select id="ms_devil" onchange="calc()"><option value="0">OFF</option><option value="200">ON</option></select></div>
-                    <div><label>장비이속합/질풍신자체</label><input type="number" id="ms_eq_sum" placeholder="0" oninput="calc()"></div>
+                    <div><label>대악마(200)</label><select id="ms_devil" onchange="calc()"><option value="0">OFF</option><option value="200">ON</option></select></div>
+                    <div><label>장비이속합</label><input type="number" id="ms_eq_sum" placeholder="0" oninput="calc()"></div>
                 </div>
                 <div class="row">
-                    <div><label>성격 이속</label><select id="ms_per" onchange="calc()"><option value="0">없음</option><option value="7">영웅심리(7%)</option><option value="10">달리기가빠른(10%)</option></select></div>
-                    <div><label>착용 질풍신 %(3~10)</label><input type="number" id="ms_wind_rate" placeholder="10" oninput="calc()"></div>
+                    <div><label>성격(7~10)</label><select id="ms_per" onchange="calc()"><option value="7" selected>영웅심리</option><option value="10">달리기</option><option value="0">없음</option></select></div>
+                    <div><label>질풍신 옵션%</label><input type="number" id="ms_wind_rate" placeholder="10" oninput="calc()"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="section-title">공격력 증가 항목 (세부 분리)</div>
+    <div class="section-title">공격력 항목 (A~E)</div>
     <div class="card">
         <div class="row">
-            <div><label>승전 버프(%)</label><input type="number" id="a_win" placeholder="0" oninput="calc()"></div>
-            <div><label>지던 버프(%)</label><input type="number" id="a_dungeon" placeholder="0" oninput="calc()"></div>
+            <div><label>승전(%)</label><input type="number" id="a_win" placeholder="0" oninput="calc()"></div>
+            <div><label>지던(%)</label><input type="number" id="a_dungeon" placeholder="0" oninput="calc()"></div>
         </div>
-        <hr>
         <div class="row">
-            <div><label>연합 버프(%)</label><input type="number" id="b_uni" placeholder="15" oninput="calc()"></div>
+            <div><label>연합(%)</label><input type="number" id="b_uni" placeholder="15" oninput="calc()"></div>
             <div><label>비법(%)</label><input type="number" id="b_etc" placeholder="15" oninput="calc()"></div>
         </div>
         <div style="margin-bottom:8px;">
             <label>성격 (공격력)</label>
             <div class="btn-group">
                 <button class="s-btn active" data-val="0" onclick="setPer(this, 'b_per')">없음</button>
-                <button class="s-btn" data-val="7" onclick="setPer(this, 'b_per')">영웅심리(7%)</button>
-                <button class="s-btn" data-val="10" onclick="setPer(this, 'b_per')">힘쌘(10%)</button>
+                <button class="s-btn" data-val="7" onclick="setPer(this, 'b_per')">영웅심리(7)</button>
+                <button class="s-btn" data-val="10" onclick="setPer(this, 'b_per')">힘쌘(10)</button>
             </div>
             <input type="hidden" id="b_per" value="0">
         </div>
         <div class="row-3">
-            <div><label>C:건물/펫(%)</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
-            <div><label>코스튬(%)</label><input type="number" id="d_cos" placeholder="0" oninput="calc()"></div>
-            <div><label>도감(%)</label><input type="number" id="d_dogam" placeholder="0" oninput="calc()"></div>
+            <div><label>C:건물/펫</label><input type="number" id="c_val" placeholder="85" oninput="calc()"></div>
+            <div><label>코스튬</label><input type="number" id="d_cos" placeholder="0" oninput="calc()"></div>
+            <div><label>도감</label><input type="number" id="d_dogam" placeholder="0" oninput="calc()"></div>
         </div>
         <div class="row-3">
-            <div><label>인장(%)</label><input type="number" id="d_seal" placeholder="0" oninput="calc()"></div>
-            <div><label>탈것(%)</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
-            <div><label>E:요정(%)</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
+            <div><label>인장</label><input type="number" id="d_seal" placeholder="0" oninput="calc()"></div>
+            <div><label>탈것</label><input type="number" id="d_ride" placeholder="0" oninput="calc()"></div>
+            <div><label>E:요정</label><input type="number" id="e_fairy" placeholder="0" oninput="calc()"></div>
         </div>
     </div>
 
@@ -124,75 +126,87 @@
     </div>
     <div class="card row">
         <div style="border-right:1px solid #444; padding-right:8px;">
-            <label>건물+펫(81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()" style="margin-bottom:5px;">
-            <label>도감(곱%)</label><input type="number" id="cp_dogam" placeholder="0" oninput="calc()" style="margin-bottom:5px;">
+            <label>건물+펫(81)</label><input type="number" id="cp_base" placeholder="81" oninput="calc()">
+            <label>도감(곱%)</label><input type="number" id="cp_dogam" placeholder="0" oninput="calc()">
             <label>탈것(곱%)</label><input type="number" id="cp_ride" placeholder="0" oninput="calc()">
         </div>
         <div>
-            <label>승전(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()" style="margin-bottom:5px;">
-            <label>도감(곱%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()" style="margin-bottom:5px;">
+            <label>승전(%)</label><input type="number" id="sp_win" placeholder="0" oninput="calc()">
+            <label>도감(곱%)</label><input type="number" id="sp_dogam" placeholder="0" oninput="calc()">
             <label>탈것(곱%)</label><input type="number" id="sp_ride" placeholder="0" oninput="calc()">
         </div>
     </div>
 
-    <div class="section-title">📦 현재 장비 + 룬 상세 (세부 분리)</div>
+    <div class="section-title">📦 현재 장비 + 룬 (순수 장비 스텟)</div>
     <div class="card">
         <div class="row">
-            <div><label>전공 장비(%)</label><input type="number" id="cur_atk_eq" placeholder="0" oninput="calc()"></div>
-            <div><label>전공 룬(%)</label><input type="number" id="cur_atk_rune" placeholder="24" oninput="calc()"></div>
+            <div><label>전공 장비</label><input type="number" id="cur_atk_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>전공 룬</label><input type="number" id="cur_atk_rune" placeholder="24" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>치피 장비(%)</label><input type="number" id="cur_cp_eq" placeholder="0" oninput="calc()"></div>
-            <div><label>치피 룬(%)</label><input type="number" id="cur_cp_rune" placeholder="28" oninput="calc()"></div>
+            <div><label>치피 장비</label><input type="number" id="cur_cp_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>치피 룬</label><input type="number" id="cur_cp_rune" placeholder="28" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>종족 장비(%)</label><input type="number" id="cur_sp_eq" placeholder="0" oninput="calc()"></div>
-            <div><label>종족 룬(%)</label><input type="number" id="cur_sp_rune" placeholder="28" oninput="calc()"></div>
+            <div><label>종족 장비</label><input type="number" id="cur_sp_eq" placeholder="0" oninput="calc()"></div>
+            <div><label>종족 룬</label><input type="number" id="cur_sp_rune" placeholder="28" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div style="grid-column: span 2;"><label>증폭(%) - 유니크 계산값 자동 동기화</label><input type="number" id="cur_amp" value="0" oninput="calc()" style="border: 1px solid var(--unique);"></div>
+            <div style="grid-column: span 2;"><label>현재 증폭(%) - 유니크 설정 시 자동 합산</label><input type="number" id="cur_amp" value="0" oninput="calc()" style="border:1px solid var(--unique);"></div>
         </div>
     </div>
 
-    <div class="section-title">✨ 시뮬레이션</div>
-    <div class="card" style="border: 1px solid var(--accent);">
+    <div class="section-title">✨ 시뮬레이션 (비교군 설정)</div>
+    <div class="card" style="border: 2px solid var(--accent);">
         <div class="row">
-            <div><label>추가 전공</label><input type="number" id="n_atk" placeholder="0" oninput="calc()"></div>
-            <div><label>추가 치피</label><input type="number" id="n_cp" placeholder="0" oninput="calc()"></div>
+            <div><label>추가 전공</label><input type="number" id="n_atk" value="0" oninput="calc()"></div>
+            <div><label>추가 치피</label><input type="number" id="n_cp" value="0" oninput="calc()"></div>
         </div>
         <div class="row">
-            <div><label>추가 증폭</label><input type="number" id="n_amp" placeholder="0" oninput="calc()"></div>
-            <div><label>추가 종족</label><input type="number" id="n_sp" placeholder="0" oninput="calc()"></div>
+            <div><label>추가 증폭</label><input type="number" id="n_amp" value="0" oninput="calc()"></div>
+            <div><label>추가 종족</label><input type="number" id="n_sp" value="0" oninput="calc()"></div>
         </div>
         
-        <button class="btn" style="background:#2c3e50; border:1px solid var(--unique); color:var(--unique);" onclick="toggleSwapBox()">🔄 유니크 스왑 시뮬레이션 도구</button>
+        <button class="btn" style="background:#2c3e50; border:1px solid var(--unique); color:var(--unique);" onclick="toggleElement('sim-wind-box')">🔄 질풍신 스왑 시뮬레이션 도구</button>
         
-        <div id="sim-swap-box" style="display:none; margin-top:10px; background:#111; padding:10px; border-radius:8px; border:1px dashed var(--unique);">
-            <div style="font-size:0.8rem; color:var(--unique); margin-bottom:10px; font-weight:bold; text-align:center;">[질풍신 스왑 시뮬레이터]</div>
+        <div id="sim-wind-box" style="display:none; margin-top:10px; background:#111; padding:10px; border-radius:8px; border:1px dashed var(--unique);">
+            <div style="font-size:0.8rem; color:var(--unique); margin-bottom:10px; text-align:center; font-weight:bold;">[질풍신 스왑 계산기 - 항목 직접 선택]</div>
             <div class="btn-group">
-                <button class="s-btn" id="sim_type_30" onclick="setSimType(30)">질풍신(30%)</button>
-                <button class="s-btn active" id="sim_type_40" onclick="setSimType(40)">진 질풍신(40%)</button>
+                <button class="s-btn" id="st_30" onclick="setSt(30)">질풍신(30)</button>
+                <button class="s-btn active" id="st_40" onclick="setSt(40)">진 질풍신(40)</button>
             </div>
             <div class="row">
-                <div><label>시뮬 헌터이속</label><select id="s_ms_hunter" onchange="calcSimWind()"><option value="30">울티(30%)</option><option value="20">레전(20%)</option><option value="10">히로익(10%)</option></select></div>
-                <div><label>시뮬 건물이속</label><input type="number" id="s_ms_build" placeholder="50" oninput="calcSimWind()"></div>
+                <div><label>헌터등급</label><select id="s_hunter"><option value="30">울티</option><option value="20">레전</option><option value="0">일반</option></select></div>
+                <div><label>건물이속</label><input type="number" id="s_build" value="50"></div>
             </div>
             <div class="row">
-                <div><label>시뮬 장비이속합</label><input type="number" id="s_ms_eq" placeholder="0" oninput="calcSimWind()"></div>
-                <div><label>시뮬 질풍신%</label><input type="number" id="s_ms_rate" placeholder="10" oninput="calcSimWind()"></div>
+                <div><label>코스튬(40)</label><select id="s_cos"><option value="40">ON</option><option value="0">OFF</option></select></div>
+                <div><label>날개(20)</label><select id="s_wing"><option value="20">ON</option><option value="0">OFF</option></select></div>
             </div>
-            <div style="font-size:0.7rem; color:#aaa; margin-top:5px;">* 코스튬/날개/인장/라이딩/비법/대악마 등은 ON으로 자동 계산</div>
-            <button class="btn" style="background:var(--unique); font-size:0.8rem; margin-top:10px;" onclick="applySwapSim()">시뮬레이션 값 적용</button>
+            <div class="row">
+                <div><label>인장(20)</label><select id="s_seal"><option value="20">ON</option><option value="0">OFF</option></select></div>
+                <div><label>라이딩(30)</label><select id="s_ride"><option value="30">ON</option><option value="0">OFF</option></select></div>
+            </div>
+            <div class="row">
+                <div><label>비법(15)</label><select id="s_etc"><option value="15">ON</option><option value="0">OFF</option></select></div>
+                <div><label>대악마(200)</label><select id="s_devil"><option value="200">ON</option><option value="0">OFF</option></select></div>
+            </div>
+            <div class="row">
+                <div><label>장비이속합</label><input type="number" id="s_eq" value="0"></div>
+                <div><label>질풍신옵%</label><input type="number" id="s_rate" value="10"></div>
+            </div>
+            <button class="btn" style="background:var(--unique);" onclick="applySim()">스왑 결과 시뮬 반영</button>
         </div>
+
+        <button class="btn reset-btn" onclick="resetSim()">🧹 시뮬레이션 초기화</button>
     </div>
 
-    <button class="btn" onclick="toggleElement('log-box')">📊 상세 계산 로그 보기</button>
-    <div id="log-box" class="log-container"></div>
+    <button class="btn" onclick="toggleElement('log-box')">📊 상세 계산 로직 확인</button>
+    <div id="log-box" class="log-container" style="display:block;">로그를 보려면 계산 버튼이나 값을 입력하세요.</div>
 </div>
 
 <script>
-    // 전역 변수
-    let simLimit = 40;
+    let simSt = 40;
 
     function toggleElement(id) {
         const box = document.getElementById(id);
@@ -200,11 +214,16 @@
     }
 
     function setPer(btn, targetId) {
-        const btns = btn.parentElement.querySelectorAll('.s-btn');
-        btns.forEach(b => b.classList.remove('active'));
+        btn.parentElement.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(targetId).value = btn.getAttribute('data-val');
         calc();
+    }
+
+    function setSt(val) {
+        simSt = val;
+        document.getElementById('st_30').classList.toggle('active', val === 30);
+        document.getElementById('st_40').classList.toggle('active', val === 40);
     }
 
     function changeMode() {
@@ -219,79 +238,101 @@
             btn.classList.remove('active');
         } else {
             document.querySelectorAll(`.u-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
-            if(document.querySelectorAll('.u-btn.active').length >= 2) return alert("최대 2개 선택 가능");
+            if(document.querySelectorAll('.u-btn.active').length >= 2) return alert("최대 2개");
             btn.classList.add('active');
         }
         document.getElementById('wind-input-area').style.display = Array.from(document.querySelectorAll('.u-btn.active')).some(b => b.innerText.includes("질풍신")) ? 'block' : 'none';
         calc();
     }
 
-    function toggleSwapBox() {
-        toggleElement('sim-swap-box');
-        if(document.getElementById('sim-swap-box').style.display === 'block') calcSimWind();
+    function resetSim() {
+        document.getElementById('n_atk').value = 0;
+        document.getElementById('n_cp').value = 0;
+        document.getElementById('n_amp').value = 0;
+        document.getElementById('n_sp').value = 0;
+        calc();
     }
 
-    function setSimType(val) {
-        simLimit = val;
-        document.getElementById('sim_type_30').classList.toggle('active', val === 30);
-        document.getElementById('sim_type_40').classList.toggle('active', val === 40);
-        calcSimWind();
-    }
+    function applySim() {
+        const g = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const names = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
+        
+        let addCp = 0;
+        let addAmp = 0;
 
-    // 질풍신 이속 -> 증폭 변환 로직
-    function getWindAmp(data) {
-        const totalMs = data.hunter + data.build + data.per + data.shoe + data.cos + data.wing + 
-                        data.seal + data.ride + data.bow + data.devil + data.eqSum + 15; // 15는 비법 고정
-        const rawAmp = totalMs * (data.rate / 100);
-        return { totalMs, rawAmp, finalAmp: Math.min(rawAmp, data.limit) };
+        // 질풍신 이속 계산
+        const ms = g('s_hunter') + g('s_build') + g('s_cos') + g('s_wing') + g('s_seal') + g('s_ride') + g('s_etc') + g('s_devil') + g('s_eq') + 15;
+        const calcAmp = Math.min(ms * (g('s_rate') / 100), simSt);
+
+        if(names.some(t => t.includes("블피"))) {
+            addCp = names.some(t => t.includes("진 블피")) ? -300 : -250;
+            addAmp = calcAmp;
+            alert(`블피 해제(치피 ${addCp}) 및 질풍신 장착(증폭 +${addAmp.toFixed(1)}) 적용`);
+        } else if(names.some(t => t.includes("질풍신"))) {
+            addCp = 300;
+            const hasNeck = names.some(t => t.includes("목걸이"));
+            addAmp = -(parseFloat(document.getElementById('cur_amp').value) - (hasNeck ? 20 : 0));
+            alert(`질풍신 해제(증폭 ${addAmp.toFixed(1)}) 및 진블피 장착(치피 +300) 적용`);
+        } else {
+            addAmp = calcAmp;
+            alert(`현재 유니크가 없으므로 질풍신 장착(증폭 +${addAmp.toFixed(1)})만 적용`);
+        }
+
+        document.getElementById('n_cp').value = addCp;
+        document.getElementById('n_amp').value = addAmp.toFixed(1);
+        calc();
     }
 
     function calc() {
-        const g = (id) => {
+        const v = (id) => {
             const el = document.getElementById(id);
             return el.value === "" ? (el.placeholder === "" ? 0 : parseFloat(el.placeholder)) : parseFloat(el.value);
         };
         const mode = document.getElementById('calc_mode').value;
         const carve = document.getElementById('a_carve').checked ? 107 : 100;
 
-        // 1. 유니크 현재 상태
-        let u_cp = 0, u_amp = 0, ms_info = null;
+        // 현재 유니크 스탯 파악
+        let cur_u_cp = 0, cur_u_amp = 0, ms_log = "";
         document.querySelectorAll('.u-btn.active').forEach(btn => {
             const type = btn.getAttribute('data-type');
-            if(type === 'blood') u_cp = parseFloat(btn.getAttribute('data-val'));
-            if(type === 'neck') u_amp += 20;
+            const val = parseFloat(btn.getAttribute('data-val'));
+            if(type === 'blood') cur_u_cp = val;
+            if(type === 'neck') cur_u_amp += 20;
             if(type === 'wind') {
-                ms_info = getWindAmp({
-                    hunter: g('ms_hunter'), build: g('ms_build'), per: g('ms_per'), shoe: g('ms_shoe'),
-                    cos: g('ms_cos'), wing: g('ms_wing'), seal: g('ms_seal'), ride: g('ms_ride'),
-                    bow: g('ms_bow'), devil: g('ms_devil'), eqSum: g('ms_eq_sum'), rate: g('ms_wind_rate'),
-                    limit: parseFloat(btn.getAttribute('data-val'))
-                });
-                u_amp += ms_info.finalAmp;
+                const ms = v('ms_hunter') + v('ms_build') + v('ms_cos') + v('ms_wing') + v('ms_seal') + v('ms_ride') + v('ms_shoe') + v('ms_bow') + v('ms_devil') + v('ms_eq_sum') + v('ms_per') + 15;
+                const wind_amp = Math.min(ms * (v('ms_wind_rate') / 100), val);
+                cur_u_amp += wind_amp;
+                ms_log = `(이속:${ms}% * 옵:${v('ms_wind_rate')}% = ${wind_amp.toFixed(1)}%)`;
             }
         });
-        document.getElementById('cur_amp').value = u_amp.toFixed(1);
+        document.getElementById('cur_amp').value = cur_u_amp.toFixed(1);
 
-        const getStats = (addAtk, addCp, addAmp, addSp, isCur) => {
-            const multA = (100 + g('a_win') + g('a_dungeon')) / 100;
-            const baseAtkSum = g('b_uni') + g('b_etc') + g('b_per') + g('c_val') + g('d_cos') + g('d_dogam') + g('d_seal') + g('d_ride');
-            const eqAtkSum = g('cur_atk_eq') + g('cur_atk_rune');
-            const multBC = (100 + baseAtkSum + eqAtkSum + addAtk) / 100;
-            const multE = (100 + g('e_fairy')) / 100;
-            const totalAtk = (mode === 'village') ? carve * multA * multBC * multE : carve * multBC * multE;
+        const run = (addAtk, addCp, addAmp, addSp, isNext) => {
+            // A. 기초
+            const A = (100 + v('a_win') + v('a_dungeon')) / 100;
+            // B~D. 증가항목
+            const baseSum = v('b_uni') + v('b_etc') + v('b_per') + v('c_val') + v('d_cos') + v('d_dogam') + v('d_seal') + v('d_ride');
+            const eqSum = v('cur_atk_eq') + v('cur_atk_rune');
+            const BC = (100 + baseSum + eqSum + (isNext ? addAtk : 0)) / 100;
+            const E = (100 + v('e_fairy')) / 100;
+            const totalAtk = (mode === 'village') ? carve * A * BC * E : carve * BC * E;
 
-            const baseCp = 175 + g('cp_base') + (isCur ? u_cp : 0) + g('cur_cp_eq') + g('cur_cp_rune') + addCp;
-            const totalCp = (baseCp * (100 + g('cp_dogam') + g('cp_ride')) / 100) / 100;
+            // 치피 (현재 유니크 치피는 현재군에만 포함)
+            const cpVal = 175 + v('cp_base') + v('cur_cp_eq') + v('cur_cp_rune') + (isNext ? 0 : cur_u_cp) + (isNext ? addCp : 0);
+            const totalCp = (cpVal * (100 + v('cp_dogam') + v('cp_ride')) / 100) / 100;
 
-            const baseSp = (100 + g('cur_sp_eq') + g('cur_sp_rune') + addSp) / 100;
-            const totalSp = (100 * baseSp * (100 + g('sp_dogam') + g('sp_ride'))/100 * (100 + g('sp_win'))/100) / 100;
+            // 종족
+            const spVal = (100 + v('cur_sp_eq') + v('cur_sp_rune') + (isNext ? addSp : 0)) / 100;
+            const totalSp = (100 * spVal * (100 + v('sp_dogam') + v('sp_ride'))/100 * (100 + v('sp_win'))/100) / 100;
 
-            const totalAmp = (100 + g('cur_amp') + addAmp) / 100;
-            return { totalAtk, totalCp, totalSp, totalAmp, final: totalAtk * totalCp * totalSp * totalAmp };
+            // 증폭
+            const totalAmp = (100 + v('cur_amp') + (isNext ? addAmp : 0)) / 100;
+
+            return { final: totalAtk * totalCp * totalSp * totalAmp, totalAtk, totalCp, totalSp, totalAmp, details: { A, BC, E, cpVal, spVal } };
         };
 
-        const cur = getStats(0, 0, 0, 0, true);
-        const next = getStats(g('n_atk'), g('n_cp'), g('n_amp'), g('n_sp'), false);
+        const cur = run(0, 0, 0, 0, false);
+        const next = run(v('n_atk'), v('n_cp'), v('n_amp'), v('n_sp'), true);
 
         document.getElementById('cur_d').innerText = Math.floor(cur.final).toLocaleString();
         document.getElementById('next_d').innerText = Math.floor(next.final).toLocaleString();
@@ -300,49 +341,32 @@
         out.innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
         out.style.color = diff >= 0 ? '#00e676' : '#ff5252';
 
-        let log = `<b>[현재]</b> 공:${cur.totalAtk.toFixed(1)} * 치:${cur.totalCp.toFixed(2)}배 * 종:${cur.totalSp.toFixed(2)}배 * 증:${cur.totalAmp.toFixed(2)}배<br>`;
-        if(ms_info) log += `<div class="wind-log">[질풍신 로그] 이속:${ms_info.totalMs}% → 증폭:${ms_info.rawAmp.toFixed(1)}% (최종:${ms_info.finalAmp}%)</div>`;
-        document.getElementById('log-box').innerHTML = log;
+        // 로그 생성
+        const logHtml = `
+[공격력 계산 (Atk)]
+- 현재: ${carve} * A(${cur.details.A}) * BC(${cur.details.BC}) * E(${cur.details.E}) = ${cur.totalAtk.toFixed(1)}
+- 비교: ${carve} * A(${next.details.A}) * BC(${next.details.BC}) * E(${next.details.E}) = ${next.totalAtk.toFixed(1)}
+
+[치명타 피해 (Crit)]
+- 현재: (${cur.details.cpVal}% * 도감/탈것) / 100 = ${cur.totalCp.toFixed(2)}배
+- 비교: (${next.details.cpVal}% * 도감/탈것) / 100 = ${next.totalCp.toFixed(2)}배
+
+[종족 피해 (Species)]
+- 현재: (100 * ${cur.details.spVal} * 도감 * 승전) / 100 = ${cur.totalSp.toFixed(2)}배
+- 비교: (100 * ${next.details.spVal} * 도감 * 승전) / 100 = ${next.totalSp.toFixed(2)}배
+
+[증폭 (Amp)]
+- 현재: (100 + ${v('cur_amp')}) / 100 = ${cur.totalAmp.toFixed(2)}배 ${ms_log}
+- 비교: (100 + ${v('cur_amp') + v('n_amp')}) / 100 = ${next.totalAmp.toFixed(2)}배
+
+[최종 데미지 결과]
+- 현재: ${Math.floor(cur.final).toLocaleString()}
+- 비교: ${Math.floor(next.final).toLocaleString()}
+- 효율: ${diff.toFixed(4)}%`;
+        document.getElementById('log-box').innerHTML = logHtml.replace(/\n/g, '<br>');
     }
 
-    function calcSimWind() {
-        const g = (id) => {
-            const el = document.getElementById(id);
-            return el.value === "" ? (el.placeholder === "" ? 0 : parseFloat(el.placeholder)) : parseFloat(el.value);
-        };
-        const simData = getWindAmp({
-            hunter: g('s_ms_hunter'), build: g('s_ms_build'), per: 7, shoe: 45,
-            cos: 40, wing: 20, seal: 20, ride: 30, bow: 80, devil: 200,
-            eqSum: g('s_ms_eq'), rate: g('s_ms_rate'), limit: simLimit
-        });
-        document.getElementById('n_amp').placeholder = simData.finalAmp.toFixed(1);
-        return simData.finalAmp;
-    }
-
-    function applySwapSim() {
-        const activeUniqueNames = Array.from(document.querySelectorAll('.u-btn.active')).map(b => b.innerText);
-        let addCp = 0;
-        let addAmp = 0;
-
-        // 1. 현재 블피 장착 중인 경우
-        if(activeUniqueNames.some(t => t.includes("블피"))) {
-            addCp = activeUniqueNames.some(t => t.includes("진 블피")) ? -300 : -250;
-            addAmp = calcSimWind(); 
-        } 
-        // 2. 현재 질풍신 장착 중인 경우
-        else if(activeUniqueNames.some(t => t.includes("질풍신"))) {
-            addCp = 300; 
-            const hasNeck = activeUniqueNames.some(t => t.includes("용의 목걸이"));
-            addAmp = -(parseFloat(document.getElementById('cur_amp').value) - (hasNeck ? 20 : 0));
-        }
-
-        document.getElementById('n_cp').value = addCp;
-        document.getElementById('n_amp').value = addAmp.toFixed(1);
-        calc();
-        alert("시뮬레이션 값이 적용되었습니다.");
-    }
-
-    window.onload = () => { changeMode(); calc(); };
+    window.onload = () => { changeMode(); };
 </script>
 </body>
 </html>
