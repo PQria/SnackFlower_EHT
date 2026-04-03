@@ -366,7 +366,7 @@
         document.getElementById('eff_out').innerText = `효율: ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
         document.getElementById('eff_out').style.color = (Math.abs(diff) < 0.001) ? '#00e676' : (diff > 0 ? '#00e676' : '#ff5252');
 
-        // 상세 로직 확인 업데이트 (수정됨)
+ // 상세 로직 및 가치 분석 업데이트 (이 전체 내용을 교체하세요)
         document.getElementById('log-box').innerHTML = `
 <b>[1. 공격력 상세 로직]</b>
 공식: ${mode === 'village' ? '각인 * A * (B+C) * D * E' : 'B * D * E'}
@@ -388,11 +388,8 @@
 <b>[3. 최종 계산 결과]</b>
 • 현재: ${cur.atk.toFixed(4)} * ${cur.cp.toFixed(3)} * ${cur.sp.toFixed(3)} * ${cur.amp.toFixed(3)} = ${(cur.final*1000).toFixed(0)}
 • 비교: ${next.atk.toFixed(4)} * ${next.cp.toFixed(3)} * ${next.sp.toFixed(3)} * ${next.amp.toFixed(3)} = ${(next.final*1000).toFixed(0)}
-• 효율 차이: <b>${diff.toFixed(4)}%</b>`;
-    }
+• 효율 차이: <b>${diff.toFixed(4)}%</b>
 
-    window.onload = () => { changeMode(); calc(); };
-    
 <hr style="border:0; border-top:1px dashed #444; margin:10px 0;">
 
 <b>[4. 가치 분석 (현재 스탯 대비 1%당 효율)]</b>
@@ -405,7 +402,7 @@
         <span style="color:#aaa; font-size:0.7rem;">치명피해 1% 증가 시</span><br>
         <span style="color:#fff;">+${(100 / cur.cpTotal * 100).toFixed(3)}%</span>
     </div>
-    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid #unique;">
+    <div style="background:#222; padding:8px; border-radius:4px; border-left:3px solid var(--unique);">
         <span style="color:#aaa; font-size:0.7rem;">증폭 1% 증가 시</span><br>
         <span style="color:#fff;">+${(100 / (100 + cur.ampSum) * 100).toFixed(3)}%</span>
     </div>
@@ -416,8 +413,7 @@
 </div>
 <div style="margin-top:8px; font-size:0.7rem; color:#888;">
     * 위 수치가 높을수록 해당 옵션을 올렸을 때의 실질 데미지 상승 폭이 큽니다.
-</div>
-    
+</div>`;
 </script>
 </body>
 </html>
